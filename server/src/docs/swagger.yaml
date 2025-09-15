@@ -1,0 +1,1650 @@
+openapi: 3.0.3
+info:
+  title: Rental Management Service API Specification
+  version: '498'
+  description: API documentation for the Rental Management Service bounded context.
+servers:
+  - url: /api/v1
+    description: Development Server
+tags:
+  - name: RentalManagementService
+    description: Operations related to the RentalManagementService bounded context.
+paths:
+  /schedule-lease-end:
+    post:
+      summary: Schedule Lease End
+      description: Executes the "Schedule Lease End" command. ...
+      operationId: scheduleLeaseEnd
+      tags:
+        - RentalManagementService
+      responses:
+        '200':
+          description: 'OK: The resource was updated successfully.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lease'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduleLeaseEndRequest'
+  /create-turnover:
+    post:
+      summary: Create Turnover
+      description: Executes the "Create Turnover" command. ...
+      operationId: createTurnover
+      tags:
+        - RentalManagementService
+      responses:
+        '200':
+          description: 'OK: The resource was updated successfully.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Turnover'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTurnoverRequest'
+  /schedule-inspection:
+    post:
+      summary: Schedule Inspection
+      description: Executes the "Schedule Inspection" command. ...
+      operationId: scheduleInspection
+      tags:
+        - RentalManagementService
+      responses:
+        '200':
+          description: 'OK: The resource was updated successfully.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inspection'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduleInspectionRequest'
+  /mark-lease-ended:
+    post:
+      summary: Mark Lease Ended
+      description: Executes the "Mark Lease Ended" command. ...
+      operationId: markLeaseEnded
+      tags:
+        - RentalManagementService
+      responses:
+        '200':
+          description: 'OK: The resource was updated successfully.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lease'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MarkLeaseEndedRequest'
+  /record-apartment-vacated:
+    post:
+      summary: Record Apartment Vacated
+      description: Executes the "Record Apartment Vacated" command. ...
+      operationId: recordApartmentVacated
+      tags:
+        - RentalManagementService
+      responses:
+        '200':
+          description: 'OK: The resource was updated successfully.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Turnover'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordApartmentVacatedRequest'
+  /complete-inspection:
+    post:
+      summary: Complete Inspection
+      description: Executes the "Complete Inspection" command. ...
+      operationId: completeInspection
+      tags:
+        - RentalManagementService
+      responses:
+        '200':
+          description: 'OK: The resource was updated successfully.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inspection'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompleteInspectionRequest'
+  /create-renovation-report:
+    post:
+      summary: Create Renovation Report
+      description: Executes the "Create Renovation Report" command. ...
+      operationId: createRenovationReport
+      tags:
+        - RentalManagementService
+      responses:
+        '200':
+          description: 'OK: The resource was updated successfully.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RenovationReport'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRenovationReportRequest'
+  /request-renovation-estimate:
+    post:
+      summary: Request Renovation Estimate
+      description: Executes the "Request Renovation Estimate" command. ...
+      operationId: requestRenovationEstimate
+      tags:
+        - RentalManagementService
+      responses:
+        '200':
+          description: 'OK: The resource was updated successfully.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RenovationCase'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestRenovationEstimateRequest'
+  /provide-renovation-estimate:
+    post:
+      summary: Provide Renovation Estimate
+      description: Executes the "Provide Renovation Estimate" command. ...
+      operationId: provideRenovationEstimate
+      tags:
+        - RentalManagementService
+      responses:
+        '200':
+          description: 'OK: The resource was updated successfully.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RenovationCase'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProvideRenovationEstimateRequest'
+  /select-renovation-plan:
+    post:
+      summary: Select Renovation Plan
+      description: Executes the "Select Renovation Plan" command. ...
+      operationId: selectRenovationPlan
+      tags:
+        - RentalManagementService
+      responses:
+        '200':
+          description: 'OK: The resource was updated successfully.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RenovationCase'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SelectRenovationPlanRequest'
+  /create-work-order:
+    post:
+      summary: Create Work Order
+      description: Executes the "Create Work Order" command. ...
+      operationId: createWorkOrder
+      tags:
+        - RentalManagementService
+      responses:
+        '200':
+          description: 'OK: The resource was updated successfully.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkOrder'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWorkOrderRequest'
+  /schedule-work-order:
+    post:
+      summary: Schedule Work Order
+      description: Executes the "Schedule Work Order" command. ...
+      operationId: scheduleWorkOrder
+      tags:
+        - RentalManagementService
+      responses:
+        '200':
+          description: 'OK: The resource was updated successfully.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkOrder'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduleWorkOrderRequest'
+  /complete-work-order:
+    post:
+      summary: Complete Work Order
+      description: Executes the "Complete Work Order" command. ...
+      operationId: completeWorkOrder
+      tags:
+        - RentalManagementService
+      responses:
+        '200':
+          description: 'OK: The resource was updated successfully.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkOrder'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompleteWorkOrderRequest'
+  /pass-final-inspection:
+    post:
+      summary: Pass Final Inspection
+      description: Executes the "Pass Final Inspection" command. ...
+      operationId: passFinalInspection
+      tags:
+        - RentalManagementService
+      responses:
+        '200':
+          description: 'OK: The resource was updated successfully.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inspection'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PassFinalInspectionRequest'
+  /complete-turnover:
+    post:
+      summary: Complete Turnover
+      description: Executes the "Complete Turnover" command. ...
+      operationId: completeTurnover
+      tags:
+        - RentalManagementService
+      responses:
+        '200':
+          description: 'OK: The resource was updated successfully.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Turnover'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompleteTurnoverRequest'
+  /create-property:
+    post:
+      summary: Create Property
+      description: Executes the "Create Property" command. ...
+      operationId: createProperty
+      tags:
+        - RentalManagementService
+      responses:
+        '200':
+          description: 'OK: The resource was updated successfully.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Property'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePropertyRequest'
+  /create-apartment:
+    post:
+      summary: Create Apartment
+      description: Executes the "Create Apartment" command. ...
+      operationId: createApartment
+      tags:
+        - RentalManagementService
+      responses:
+        '200':
+          description: 'OK: The resource was updated successfully.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Apartment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateApartmentRequest'
+  /create-lease:
+    post:
+      summary: Create Lease
+      description: Executes the "Create Lease" command. ...
+      operationId: createLease
+      tags:
+        - RentalManagementService
+      responses:
+        '200':
+          description: 'OK: The resource was updated successfully.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lease'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLeaseRequest'
+  /get-lease-by-id/{id}:
+    get:
+      summary: Get Lease by ID
+      description: Retrieves data based on the "Get Lease by ID" query. This is a synchronous query operation.
+      operationId: getLeaseByID
+      tags:
+        - RentalManagementService
+      responses:
+        '200':
+          description: Successful retrieval of data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lease'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+  /get-all-leases:
+    get:
+      summary: Get All Leases
+      description: Retrieves data based on the "Get All Leases" query. This is a synchronous query operation.
+      operationId: getAllLeases
+      tags:
+        - RentalManagementService
+      responses:
+        '200':
+          description: Successful retrieval of data.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Lease'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /get-all-turnovers:
+    get:
+      summary: Get All Turnovers
+      description: Retrieves data based on the "Get All Turnovers" query. This is a synchronous query operation.
+      operationId: getAllTurnovers
+      tags:
+        - RentalManagementService
+      responses:
+        '200':
+          description: Successful retrieval of data.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Turnover'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /get-all-apartments:
+    get:
+      summary: Get All Apartments
+      description: Retrieves data based on the "Get All Apartments" query. This is a synchronous query operation.
+      operationId: getAllApartments
+      tags:
+        - RentalManagementService
+      responses:
+        '200':
+          description: Successful retrieval of data.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Apartment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /get-inspection-by-id/{id}:
+    get:
+      summary: Get Inspection by ID
+      description: Retrieves data based on the "Get Inspection by ID" query. This is a synchronous query operation.
+      operationId: getInspectionByID
+      tags:
+        - RentalManagementService
+      responses:
+        '200':
+          description: Successful retrieval of data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inspection'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+  /get-all-inspections:
+    get:
+      summary: Get All Inspections
+      description: Retrieves data based on the "Get All Inspections" query. This is a synchronous query operation.
+      operationId: getAllInspections
+      tags:
+        - RentalManagementService
+      responses:
+        '200':
+          description: Successful retrieval of data.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Inspection'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /get-all-renovation-cases:
+    get:
+      summary: Get All Renovation Cases
+      description: Retrieves data based on the "Get All Renovation Cases" query. This is a synchronous query operation.
+      operationId: getAllRenovationCases
+      tags:
+        - RentalManagementService
+      responses:
+        '200':
+          description: Successful retrieval of data.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RenovationCase'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /get-all-work-orders:
+    get:
+      summary: Get All Work Orders
+      description: Retrieves data based on the "Get All Work Orders" query. This is a synchronous query operation.
+      operationId: getAllWorkOrders
+      tags:
+        - RentalManagementService
+      responses:
+        '200':
+          description: Successful retrieval of data.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkOrder'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /get-all-propertys:
+    get:
+      summary: Get All Propertys
+      description: Retrieves data based on the "Get All Propertys" query. This is a synchronous query operation.
+      operationId: getAllPropertys
+      tags:
+        - RentalManagementService
+      responses:
+        '200':
+          description: Successful retrieval of data.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Property'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          example: An error occurred.
+    Lease:
+      type: object
+      description: Represents a Lease in the system.
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the Lease (primary key).
+          example: lease-1001
+        apartmentId:
+          type: string
+          description: The apartmentId of the Lease.
+          example: apt-22B
+        endDate:
+          type: string
+          description: The endDate of the Lease.
+          example: '2025-09-30'
+        noticeDate:
+          type: string
+          description: The noticeDate of the Lease.
+          example: '2025-08-01'
+        currentRent:
+          type: string
+          description: The currentRent of the Lease.
+          example: '1450'
+        propertyId:
+          type: string
+          description: The propertyId of the Lease.
+          example: prop-001
+        nextActorEmail:
+          type: string
+          description: The nextActorEmail of the Lease.
+          example: ops@rentco.com
+        moveOutConfirmedAt:
+          type: string
+          description: The moveOutConfirmedAt of the Lease.
+          example: 2025-09-30T10:00
+        turnoverId:
+          type: string
+          description: The turnoverId of the Lease.
+          example: to-5001
+        tenantName:
+          type: string
+          description: The tenantName of the Lease.
+          example: Alexandra Nguyen
+      required:
+        - id
+        - apartmentId
+        - endDate
+        - noticeDate
+        - currentRent
+        - propertyId
+        - moveOutConfirmedAt
+        - turnoverId
+        - tenantName
+    Turnover:
+      type: object
+      description: Represents a Turnover in the system.
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the Turnover (primary key).
+          example: to-5001
+        leaseId:
+          type: string
+          description: The leaseId of the Turnover.
+          example: lease-1001
+        apartmentId:
+          type: string
+          description: The apartmentId of the Turnover.
+          example: apt-22B
+        targetReadyDate:
+          type: string
+          description: The targetReadyDate of the Turnover.
+          example: '2025-10-15'
+        propertyId:
+          type: string
+          description: The propertyId of the Turnover.
+          example: prop-001
+        nextActorEmail:
+          type: string
+          description: The nextActorEmail of the Turnover.
+          example: inspections@rentco.com
+        vacatedAt:
+          type: string
+          description: The vacatedAt of the Turnover.
+          example: 2025-09-30T12:00
+        keysReturned:
+          type: string
+          description: The keysReturned of the Turnover.
+          example: 'true'
+        notes:
+          type: string
+          description: The notes of the Turnover.
+          example: No issues
+        readyToRentDate:
+          type: string
+          description: The readyToRentDate of the Turnover.
+          example: '2025-10-20'
+        listingReady:
+          type: string
+          description: The listingReady of the Turnover.
+          example: 'true'
+        marketingEmail:
+          type: string
+          description: The marketingEmail of the Turnover.
+          example: list@rentco.com
+        finalInspectionPassedAt:
+          type: string
+          description: The finalInspectionPassedAt of the Turnover.
+          example: 2025-10-19T15:30
+        openWorkOrdersCount:
+          type: string
+          description: The openWorkOrdersCount of the Turnover.
+          example: '0'
+        leaseEndDate:
+          type: string
+          description: The leaseEndDate of the Turnover.
+          example: '2025-09-30'
+        checklist:
+          type: string
+          description: The checklist of the Turnover.
+          example: Move-out inspection done
+      required:
+        - id
+        - leaseId
+        - apartmentId
+        - targetReadyDate
+        - propertyId
+        - vacatedAt
+        - keysReturned
+        - readyToRentDate
+    Inspection:
+      type: object
+      description: Represents a Inspection in the system.
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the Inspection (primary key).
+          example: insp-9001
+        turnoverId:
+          type: string
+          description: The turnoverId of the Inspection.
+          example: to-5001
+        apartmentId:
+          type: string
+          description: The apartmentId of the Inspection.
+          example: apt-22B
+        scheduledAt:
+          type: string
+          description: The scheduledAt of the Inspection.
+          example: 2025-09-28T09:00
+        assignedToEmail:
+          type: string
+          description: The assignedToEmail of the Inspection.
+          example: inspector1@rentco.com
+        inspectorName:
+          type: string
+          description: The inspectorName of the Inspection.
+          example: A. Rivera
+        locationNotes:
+          type: string
+          description: The locationNotes of the Inspection.
+          example: Basement entry
+        nextActorEmail:
+          type: string
+          description: The nextActorEmail of the Inspection.
+          example: tenant@ex.com
+        completedAt:
+          type: string
+          description: The completedAt of the Inspection.
+          example: 2025-09-28T10:15
+        findingsSummary:
+          type: string
+          description: The findingsSummary of the Inspection.
+          example: Minor scuffs
+        hasDamages:
+          type: string
+          description: The hasDamages of the Inspection.
+          example: 'true'
+        photosUrl:
+          type: string
+          description: The photosUrl of the Inspection.
+          example: https://pics.io/i9001
+        passedAt:
+          type: string
+          description: The passedAt of the Inspection.
+          example: 2025-10-18T11:00
+        certificateUrl:
+          type: string
+          description: The certificateUrl of the Inspection.
+          example: https://docs.io/c9001
+        checklist:
+          type: string
+          description: The checklist of the Inspection.
+          example: Standard move-out list
+      required:
+        - id
+        - turnoverId
+        - apartmentId
+        - scheduledAt
+        - inspectorName
+        - completedAt
+        - findingsSummary
+        - hasDamages
+        - passedAt
+    RenovationReport:
+      type: object
+      description: Represents a Renovation Report in the system.
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the Renovation Report (primary key).
+          example: dr-7001
+        turnoverId:
+          type: string
+          description: The turnoverId of the Renovation Report.
+          example: to-5001
+        inspectionId:
+          type: string
+          description: The inspectionId of the Renovation Report.
+          example: insp-9001
+        apartmentId:
+          type: string
+          description: The apartmentId of the Renovation Report.
+          example: apt-22B
+        damageSeverity:
+          type: string
+          description: The damageSeverity of the Renovation Report.
+          example: medium
+        estimatedRepairCost:
+          type: string
+          description: The estimatedRepairCost of the Renovation Report.
+          example: '850'
+        damageSummary:
+          type: string
+          description: The damageSummary of the Renovation Report.
+          example: Paint, sink leak
+        nextActorEmail:
+          type: string
+          description: The nextActorEmail of the Renovation Report.
+          example: constr@rentco.com
+      required:
+        - id
+        - turnoverId
+        - inspectionId
+        - apartmentId
+        - damageSeverity
+        - estimatedRepairCost
+        - damageSummary
+    RenovationCase:
+      type: object
+      description: Represents a Renovation Case in the system.
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the Renovation Case (primary key).
+          example: reno-6001
+        turnoverId:
+          type: string
+          description: The turnoverId of the Renovation Case.
+          example: to-5001
+        apartmentId:
+          type: string
+          description: The apartmentId of the Renovation Case.
+          example: apt-22B
+        requestedLevels:
+          type: string
+          description: The requestedLevels of the Renovation Case.
+          example: good,better
+        scopeNotes:
+          type: string
+          description: The scopeNotes of the Renovation Case.
+          example: Paint + bath reseal
+        targetReadyDate:
+          type: string
+          description: The targetReadyDate of the Renovation Case.
+          example: '2025-10-20'
+        nextActorEmail:
+          type: string
+          description: The nextActorEmail of the Renovation Case.
+          example: constr@rentco.com
+        costGood:
+          type: string
+          description: The costGood of the Renovation Case.
+          example: '1200'
+        costBetter:
+          type: string
+          description: The costBetter of the Renovation Case.
+          example: '1800'
+        costPremium:
+          type: string
+          description: The costPremium of the Renovation Case.
+          example: '3000'
+        leadDaysGood:
+          type: string
+          description: The leadDaysGood of the Renovation Case.
+          example: '5'
+        leadDaysBetter:
+          type: string
+          description: The leadDaysBetter of the Renovation Case.
+          example: '8'
+        leadDaysPremium:
+          type: string
+          description: The leadDaysPremium of the Renovation Case.
+          example: '12'
+        selectedLevel:
+          type: string
+          description: The selectedLevel of the Renovation Case.
+          example: good
+        budgetApproved:
+          type: string
+          description: The budgetApproved of the Renovation Case.
+          example: 'true'
+        expectedCompletionDate:
+          type: string
+          description: The expectedCompletionDate of the Renovation Case.
+          example: '2025-10-18'
+        currentRent:
+          type: string
+          description: The currentRent of the Renovation Case.
+          example: '1200'
+        projectedRent:
+          type: string
+          description: The projectedRent of the Renovation Case.
+          example: '1550'
+        decisionReason:
+          type: string
+          description: The decisionReason of the Renovation Case.
+          example: ROI ok
+      required:
+        - id
+        - turnoverId
+        - apartmentId
+    WorkOrder:
+      type: object
+      description: Represents a Work Order in the system.
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the Work Order (primary key).
+          example: wo-8001
+        renovationCaseId:
+          type: string
+          description: The renovationCaseId of the Work Order.
+          example: reno-6001
+        turnoverId:
+          type: string
+          description: The turnoverId of the Work Order.
+          example: to-5001
+        apartmentId:
+          type: string
+          description: The apartmentId of the Work Order.
+          example: apt-22B
+        scopeSummary:
+          type: string
+          description: The scopeSummary of the Work Order.
+          example: Paint walls, reseal bath
+        accessDetails:
+          type: string
+          description: The accessDetails of the Work Order.
+          example: Supra 4452
+        materialsList:
+          type: string
+          description: The materialsList of the Work Order.
+          example: Paint, caulk
+        nextActorEmail:
+          type: string
+          description: The nextActorEmail of the Work Order.
+          example: crew@rentco.com
+        startDate:
+          type: string
+          description: The startDate of the Work Order.
+          example: '2025-10-05'
+        endDate:
+          type: string
+          description: The endDate of the Work Order.
+          example: '2025-10-10'
+        crewName:
+          type: string
+          description: The crewName of the Work Order.
+          example: Crew Alpha
+        assignedToEmail:
+          type: string
+          description: The assignedToEmail of the Work Order.
+          example: lead1@rentco.com
+        materialsReady:
+          type: string
+          description: The materialsReady of the Work Order.
+          example: 'true'
+        actualStartDate:
+          type: string
+          description: The actualStartDate of the Work Order.
+          example: '2025-10-06'
+        actualEndDate:
+          type: string
+          description: The actualEndDate of the Work Order.
+          example: '2025-10-09'
+        completionNotes:
+          type: string
+          description: The completionNotes of the Work Order.
+          example: On time, good
+        photosUrl:
+          type: string
+          description: The photosUrl of the Work Order.
+          example: https://pics.io/wo8001
+        varianceNotes:
+          type: string
+          description: The varianceNotes of the Work Order.
+          example: +1 day better scope
+      required:
+        - id
+        - renovationCaseId
+        - turnoverId
+        - apartmentId
+        - scopeSummary
+        - materialsList
+        - startDate
+        - endDate
+        - crewName
+        - assignedToEmail
+        - actualStartDate
+        - actualEndDate
+        - completionNotes
+    Apartment:
+      type: object
+      description: Represents a Apartment in the system.
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the Apartment (primary key).
+          example: apt-22B
+        propertyId:
+          type: string
+          description: The propertyId of the Apartment.
+          example: prop-001
+        unitNumber:
+          type: string
+          description: The unitNumber of the Apartment.
+          example: 22B
+        floorAreaSqm:
+          type: string
+          description: The floorAreaSqm of the Apartment.
+          example: '62'
+        bedrooms:
+          type: string
+          description: The bedrooms of the Apartment.
+          example: '2'
+        status:
+          type: string
+          description: The status of the Apartment.
+          example: Occupied
+      required:
+        - id
+        - propertyId
+        - unitNumber
+        - floorAreaSqm
+        - bedrooms
+        - status
+    Property:
+      type: object
+      description: Represents a Property in the system.
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the Property (primary key).
+          example: prop-001
+        name:
+          type: string
+          description: The name of the Property.
+          example: Maple Court
+        address:
+          type: string
+          description: The address of the Property.
+          example: 12 Main St
+        managerName:
+          type: string
+          description: The managerName of the Property.
+          example: Jordan Alvarez
+        managerEmail:
+          type: string
+          description: The managerEmail of the Property.
+          example: pm@rentco.com
+        unitsCount:
+          type: string
+          description: The unitsCount of the Property.
+          example: '120'
+      required:
+        - id
+        - name
+        - address
+        - managerName
+        - managerEmail
+        - unitsCount
+    ScheduleLeaseEndRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          example: lease-1001
+        apartmentId:
+          type: string
+          example: apt-22B
+        endDate:
+          type: string
+          example: '2025-09-30'
+        noticeDate:
+          type: string
+          example: '2025-08-01'
+        currentRent:
+          type: string
+          example: '1450'
+        nextActorEmail:
+          type: string
+          example: ops@rentco.com
+      required:
+        - id
+        - apartmentId
+        - endDate
+        - noticeDate
+        - currentRent
+    CreateTurnoverRequest:
+      type: object
+      properties:
+        leaseId:
+          type: string
+          example: lease-1001
+        apartmentId:
+          type: string
+          example: apt-22B
+        targetReadyDate:
+          type: string
+          example: '2025-10-15'
+        propertyId:
+          type: string
+          example: prop-001
+        nextActorEmail:
+          type: string
+          example: inspections@rentco.com
+      required:
+        - leaseId
+        - apartmentId
+        - targetReadyDate
+        - propertyId
+    ScheduleInspectionRequest:
+      type: object
+      properties:
+        turnoverId:
+          type: string
+          example: to-5001
+        apartmentId:
+          type: string
+          example: apt-22B
+        scheduledAt:
+          type: string
+          example: 2025-09-28T09:00
+        assignedToEmail:
+          type: string
+          example: inspector1@rentco.com
+        locationNotes:
+          type: string
+          example: Basement entry
+        nextActorEmail:
+          type: string
+          example: tenant@ex.com
+      required:
+        - turnoverId
+        - apartmentId
+        - scheduledAt
+    MarkLeaseEndedRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          example: lease-1001
+        apartmentId:
+          type: string
+          example: apt-22B
+        endDate:
+          type: string
+          example: '2025-09-30'
+        moveOutConfirmedAt:
+          type: string
+          example: 2025-09-30T10:00
+        turnoverId:
+          type: string
+          example: to-5001
+        nextActorEmail:
+          type: string
+          example: ops@rentco.com
+      required:
+        - id
+        - apartmentId
+        - endDate
+        - moveOutConfirmedAt
+        - turnoverId
+    RecordApartmentVacatedRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          example: to-5001
+        apartmentId:
+          type: string
+          example: apt-22B
+        vacatedAt:
+          type: string
+          example: 2025-09-30T12:00
+        keysReturned:
+          type: string
+          example: 'true'
+        notes:
+          type: string
+          example: No issues
+        nextActorEmail:
+          type: string
+          example: inspections@rentco.com
+      required:
+        - id
+        - apartmentId
+        - vacatedAt
+        - keysReturned
+    CompleteInspectionRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          example: insp-9001
+        turnoverId:
+          type: string
+          example: to-5001
+        apartmentId:
+          type: string
+          example: apt-22B
+        completedAt:
+          type: string
+          example: 2025-09-28T10:15
+        findingsSummary:
+          type: string
+          example: Minor scuffs
+        hasDamages:
+          type: string
+          example: 'true'
+        photosUrl:
+          type: string
+          example: https://pics.io/i9001
+        nextActorEmail:
+          type: string
+          example: tenant@ex.com
+      required:
+        - id
+        - turnoverId
+        - apartmentId
+        - completedAt
+        - findingsSummary
+        - hasDamages
+    CreateRenovationReportRequest:
+      type: object
+      properties:
+        turnoverId:
+          type: string
+          example: to-5001
+        inspectionId:
+          type: string
+          example: insp-9001
+        apartmentId:
+          type: string
+          example: apt-22B
+        damageSeverity:
+          type: string
+          example: medium
+        estimatedRepairCost:
+          type: string
+          example: '850'
+        damageSummary:
+          type: string
+          example: Paint, sink leak
+        nextActorEmail:
+          type: string
+          example: constr@rentco.com
+      required:
+        - turnoverId
+        - inspectionId
+        - apartmentId
+        - damageSeverity
+        - estimatedRepairCost
+        - damageSummary
+    RequestRenovationEstimateRequest:
+      type: object
+      properties:
+        turnoverId:
+          type: string
+          example: to-5001
+        apartmentId:
+          type: string
+          example: apt-22B
+        requestedLevels:
+          type: string
+          example: good,better
+        scopeNotes:
+          type: string
+          example: Paint + bath reseal
+        targetReadyDate:
+          type: string
+          example: '2025-10-20'
+        nextActorEmail:
+          type: string
+          example: constr@rentco.com
+      required:
+        - turnoverId
+        - apartmentId
+    ProvideRenovationEstimateRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          example: reno-6001
+        costGood:
+          type: string
+          example: '1200'
+        costBetter:
+          type: string
+          example: '1800'
+        costPremium:
+          type: string
+          example: '3000'
+        leadDaysGood:
+          type: string
+          example: '5'
+        leadDaysBetter:
+          type: string
+          example: '8'
+        leadDaysPremium:
+          type: string
+          example: '12'
+        nextActorEmail:
+          type: string
+          example: constr@rentco.com
+      required:
+        - id
+    SelectRenovationPlanRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          example: reno-6001
+        apartmentId:
+          type: string
+          example: apt-22B
+        selectedLevel:
+          type: string
+          example: good
+        budgetApproved:
+          type: string
+          example: 'true'
+        expectedCompletionDate:
+          type: string
+          example: '2025-10-18'
+        projectedRent:
+          type: string
+          example: '1550'
+        decisionReason:
+          type: string
+          example: ROI ok
+        nextActorEmail:
+          type: string
+          example: constr@rentco.com
+      required:
+        - id
+        - apartmentId
+    CreateWorkOrderRequest:
+      type: object
+      properties:
+        renovationCaseId:
+          type: string
+          example: reno-6001
+        turnoverId:
+          type: string
+          example: to-5001
+        apartmentId:
+          type: string
+          example: apt-22B
+        scopeSummary:
+          type: string
+          example: Paint walls, reseal bath
+        accessDetails:
+          type: string
+          example: Supra 4452
+        materialsList:
+          type: string
+          example: Paint, caulk
+        nextActorEmail:
+          type: string
+          example: crew@rentco.com
+      required:
+        - renovationCaseId
+        - turnoverId
+        - apartmentId
+        - scopeSummary
+        - materialsList
+    ScheduleWorkOrderRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          example: wo-8001
+        apartmentId:
+          type: string
+          example: apt-22B
+        startDate:
+          type: string
+          example: '2025-10-05'
+        endDate:
+          type: string
+          example: '2025-10-10'
+        crewName:
+          type: string
+          example: Crew Alpha
+        assignedToEmail:
+          type: string
+          example: lead1@rentco.com
+        materialsReady:
+          type: string
+          example: 'true'
+        nextActorEmail:
+          type: string
+          example: crew@rentco.com
+      required:
+        - id
+        - apartmentId
+        - startDate
+        - endDate
+        - crewName
+        - assignedToEmail
+    CompleteWorkOrderRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          example: wo-8001
+        apartmentId:
+          type: string
+          example: apt-22B
+        actualStartDate:
+          type: string
+          example: '2025-10-06'
+        actualEndDate:
+          type: string
+          example: '2025-10-09'
+        completionNotes:
+          type: string
+          example: On time, good
+        photosUrl:
+          type: string
+          example: https://pics.io/wo8001
+        varianceNotes:
+          type: string
+          example: +1 day better scope
+        nextActorEmail:
+          type: string
+          example: crew@rentco.com
+      required:
+        - id
+        - apartmentId
+        - actualStartDate
+        - actualEndDate
+        - completionNotes
+    PassFinalInspectionRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          example: insp-9001
+        turnoverId:
+          type: string
+          example: to-5001
+        apartmentId:
+          type: string
+          example: apt-22B
+        passedAt:
+          type: string
+          example: 2025-10-18T11:00
+        inspectorName:
+          type: string
+          example: A. Rivera
+        certificateUrl:
+          type: string
+          example: https://docs.io/c9001
+        nextActorEmail:
+          type: string
+          example: tenant@ex.com
+      required:
+        - id
+        - turnoverId
+        - apartmentId
+        - passedAt
+        - inspectorName
+    CompleteTurnoverRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          example: to-5001
+        readyToRentDate:
+          type: string
+          example: '2025-10-20'
+        listingReady:
+          type: string
+          example: 'true'
+        marketingEmail:
+          type: string
+          example: list@rentco.com
+        apartmentId:
+          type: string
+          example: apt-22B
+        notes:
+          type: string
+          example: No issues
+      required:
+        - id
+        - readyToRentDate
+        - apartmentId
+    CreatePropertyRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Maple Court
+        address:
+          type: string
+          example: 12 Main St
+        managerName:
+          type: string
+          example: Jordan Alvarez
+        managerEmail:
+          type: string
+          example: pm@rentco.com
+        unitsCount:
+          type: string
+          example: '120'
+      required:
+        - name
+        - address
+        - managerName
+        - managerEmail
+        - unitsCount
+    CreateApartmentRequest:
+      type: object
+      properties:
+        propertyId:
+          type: string
+          example: prop-001
+        unitNumber:
+          type: string
+          example: 22B
+        floorAreaSqm:
+          type: string
+          example: '62'
+        bedrooms:
+          type: string
+          example: '2'
+        status:
+          type: string
+          example: Occupied
+      required:
+        - propertyId
+        - unitNumber
+        - floorAreaSqm
+        - bedrooms
+        - status
+    CreateLeaseRequest:
+      type: object
+      properties:
+        apartmentId:
+          type: string
+          example: apt-22B
+        currentRent:
+          type: string
+          example: '1450'
+        nextActorEmail:
+          type: string
+          example: ops@rentco.com
+        tenantName:
+          type: string
+          example: Alexandra Nguyen
+      required:
+        - apartmentId
+        - currentRent
+        - tenantName
+  parameters:
+    LeaseId:
+      name: id
+      in: path
+      required: true
+      description: The unique identifier for the Lease.
+      schema:
+        type: string
+    TurnoverId:
+      name: id
+      in: path
+      required: true
+      description: The unique identifier for the Turnover.
+      schema:
+        type: string
+    InspectionId:
+      name: id
+      in: path
+      required: true
+      description: The unique identifier for the Inspection.
+      schema:
+        type: string
+    RenovationReportId:
+      name: id
+      in: path
+      required: true
+      description: The unique identifier for the Renovation Report.
+      schema:
+        type: string
+    RenovationCaseId:
+      name: id
+      in: path
+      required: true
+      description: The unique identifier for the Renovation Case.
+      schema:
+        type: string
+    WorkOrderId:
+      name: id
+      in: path
+      required: true
+      description: The unique identifier for the Work Order.
+      schema:
+        type: string
+    ApartmentId:
+      name: id
+      in: path
+      required: true
+      description: The unique identifier for the Apartment.
+      schema:
+        type: string
+    PropertyId:
+      name: id
+      in: path
+      required: true
+      description: The unique identifier for the Property.
+      schema:
+        type: string
+  responses:
+    BadRequest:
+      description: 'Bad Request: The server cannot or will not process the request due to something that is perceived to be a client error.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: 'Not Found: The server can not find the requested resource.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalServerError:
+      description: 'Internal Server Error: The server has encountered a situation it doesn''t know how to handle.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
