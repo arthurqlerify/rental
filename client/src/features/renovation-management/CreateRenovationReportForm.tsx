@@ -73,7 +73,7 @@ export const CreateRenovationReportForm = ({
             <FormItem>
               <FormLabel>Inspection ID</FormLabel>
               <FormControl>
-                <Input {...field} /> {/* This needs careful handling to select a valid inspection */}
+                <Input {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

@@ -4,7 +4,7 @@ import { DataTable } from "@/components/shared/DataTable";
 import { useGetAllRenovationCases } from "@/api/renovationCases";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { Pencil, FilePlus, DollarSign } from "lucide-react";
+import { Pencil, FilePlus, DollarSign, CheckSquare } from "lucide-react";
 
 interface RenovationCaseListProps {
   onCreateRenovationReport: (caseItem: RenovationCase) => void;

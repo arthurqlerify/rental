@@ -64,7 +64,7 @@ export const RequestRenovationEstimateForm = ({
             <FormItem>
               <FormLabel>Turnover ID</FormLabel>
               <FormControl>
-                <Input {...field} disabled />
+                <Input {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -77,7 +77,7 @@ export const RequestRenovationEstimateForm = ({
             <FormItem>
               <FormLabel>Apartment ID</FormLabel>
               <FormControl>
-                <Input {...field} disabled />
+                <Input {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
