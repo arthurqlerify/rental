@@ -23,8 +23,12 @@ import {
   RenovationCase,
   RequestRenovationEstimateRequest,
   requestRenovationEstimateRequestSchema,
+  Turnover,
 } from "@/lib/validators";
 import { useRequestRenovationEstimate } from "@/api/renovationCases";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useGetAllTurnovers } from "@/api/turnovers";
+import { useEffect } from "react";
 
 interface RequestRenovationEstimateFormProps {
   renovationCase?: RenovationCase;
@@ -47,7 +51,21 @@ export const RequestRenovationEstimateForm = ({
     },
   });
 
+  const { data: turnovers } = useGetAllTurnovers();
+
   const requestRenovationEstimateMutation = useRequestRenovationEstimate();
+
+  const selectedTurnover = turnovers?.find(
+    (t) => t.id === form.watch("turnoverId")
+  );
+
+  useEffect(() => {
+    if (selectedTurnover) {
+      form.setValue("apartmentId", selectedTurnover.apartmentId);
+    } else {
+      form.setValue("apartmentId", "");
+    }
+  }, [selectedTurnover, form]);
 
   const onSubmit = async (data: RequestRenovationEstimateRequest) => {
     await requestRenovationEstimateMutation.mutateAsync(data);
@@ -62,10 +80,21 @@ export const RequestRenovationEstimateForm = ({
           name="turnoverId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Turnover ID</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
+              <FormLabel>Turnover</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a turnover" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {turnovers?.map((turnover: Turnover) => (
+                    <SelectItem key={turnover.id} value={turnover.id}>
+                      {turnover.id} ({turnover.apartmentId})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
@@ -77,7 +106,7 @@ export const RequestRenovationEstimateForm = ({
             <FormItem>
               <FormLabel>Apartment ID</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input {...field} disabled />
               </FormControl>
               <FormMessage />
             </FormItem>
