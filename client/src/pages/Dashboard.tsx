@@ -76,7 +76,7 @@ const Dashboard = () => {
 
   return (
     <div className="container mx-auto py-8">
-      <PageHeader title="Dashboard" subtitle="Overview of your rental management operations." />
+      <PageHeader title="Rental overview" subtitle="Overview of your rental management operations." />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {cards.map((card, index) => (
