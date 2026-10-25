@@ -26,8 +26,8 @@ permissions: {}
 env:
   BASE: dev
   BRANCH: agent/${{ inputs.card_id }}
-  BOT_NAME: github-actions[bot]
-  BOT_ID: "41898282"
+  BOT_NAME: arthur-agent-publisher[bot]
+  BOT_ID: "347935878"
 
 jobs:
   implement:
