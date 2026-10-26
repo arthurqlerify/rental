@@ -17,7 +17,7 @@ interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
 
 const sidebarNavItems = [
   {
-    title: "Dashboard",
+    title: "Rental overview",
     href: "/",
     icon: LayoutDashboard,
   },
