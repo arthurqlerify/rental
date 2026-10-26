@@ -43,6 +43,8 @@ Rules:
 - Run the checks CLAUDE.md names for the area you change and fix every failure you caused.
 - Commit your work on the current branch (already created). Do not push, do not
   switch branches, and do not touch .github/, .env files or anything holding secrets.
+- Commit from the repository root with \`git add <paths>\`, then \`git commit -m "<message>"\`, each as a command
+  of its own. Only commands starting exactly like that are allowed, so \`git -C <path> ...\` is refused.
 - If the card is unclear or cannot be done, commit nothing and say why in your final message.
 - Your final message goes to the reviewer: say what you changed and anything you could not verify.
 `;
