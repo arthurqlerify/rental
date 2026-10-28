@@ -46,16 +46,27 @@ defineFeature(feature, test => {
             unitNumber: `Apt-${Date.now()}`,
             floorAreaSqm: '60',
             bedrooms: '2',
-            status: 'Occupied'
+            status: 'Vacant'
           });
         expect(apartmentRes.statusCode).toBe(200);
         apartmentId = apartmentRes.body.id;
 
-        // 3. Schedule Lease End (this implicitly creates the Lease and its associated Turnover)
-        // The Lease schema requires 'turnoverId', so the system should generate/link one upon lease creation.
+        // 3. Create the Lease
+        const createLeaseRes = await request(app)
+          .post('/api/v1/create-lease')
+          .send({
+            apartmentId: apartmentId,
+            currentRent: '1500',
+            nextActorEmail: 'ops@rentco.com',
+            tenantName: 'Test Tenant'
+          });
+        expect(createLeaseRes.statusCode).toBe(200);
+
+        // Schedule Lease End for today
         const leaseCreationRes = await request(app)
           .post('/api/v1/schedule-lease-end')
           .send({
+            id: createLeaseRes.body.id,
             apartmentId: apartmentId,
             endDate: LEASE_END_DATE_SHORT, // Lease ends today
             noticeDate: '2025-08-15',
@@ -64,8 +75,20 @@ defineFeature(feature, test => {
           });
         expect(leaseCreationRes.statusCode).toBe(200);
         leaseId = leaseCreationRes.body.id;
-        turnoverId = leaseCreationRes.body.turnoverId; // Capture the turnoverId implicitly created/linked by the system
         expect(leaseCreationRes.body.moveOutConfirmedAt).toBeUndefined(); // Lease is active, so moveOutConfirmedAt should not be set yet.
+
+        // Create the associated Turnover
+        const createTurnoverRes = await request(app)
+          .post('/api/v1/create-turnover')
+          .send({
+            leaseId: leaseId,
+            apartmentId: apartmentId,
+            targetReadyDate: '2025-10-15',
+            propertyId: propertyId,
+            nextActorEmail: 'inspections@rentco.com'
+          });
+        expect(createTurnoverRes.statusCode).toBe(200);
+        turnoverId = createTurnoverRes.body.id;
 
         // 4. Retrieve the associated Turnover to capture its initial state
         // Since there's no get-by-id for Turnover, we retrieve all and find the one.

@@ -51,12 +51,20 @@ defineFeature(feature, test => {
         expect(createApartmentRes.statusCode).toBe(200);
         apartmentId = createApartmentRes.body.id;
 
-        // 3. Schedule Lease End (to get a leaseId and trigger turnover process)
-        leaseId = `lease-${Date.now()}`;
+        // 3. Create a Lease and schedule its end (to get a leaseId and trigger turnover process)
+        const createLeaseRes = await request(app)
+          .post('/api/v1/create-lease')
+          .send({
+            apartmentId: apartmentId,
+            currentRent: '1800',
+            nextActorEmail: 'ops@rentco.com',
+            tenantName: 'Morgan Ellis',
+          });
+        expect(createLeaseRes.statusCode).toBe(200);
         const scheduleLeaseEndRes = await request(app)
           .post('/api/v1/schedule-lease-end')
           .send({
-            id: leaseId,
+            id: createLeaseRes.body.id,
             apartmentId: apartmentId,
             endDate: '2025-10-31', // Future date relative to current, but past for turnover process
             noticeDate: '2025-09-01',
