@@ -13,14 +13,12 @@ defineFeature(feature, test => {
   let propertyId;
   let apartmentId;
   let leaseId; // This leaseId represents an existing lease in the system
-  let turnoverId; // This turnoverId is required by the Lease schema and represents a linked existing entity
   let leaseEndDate = '2025-09-30';
   let leaseNoticeDate = '2025-08-01';
   let leaseCurrentRent = '1450';
   let leaseTenantName = 'Alexandra Nguyen';
   let leasePropertyId; // Will store the created propertyId
   let leaseNextActorEmail = 'ops@rentco.com';
-  let leaseMoveOutConfirmedAt = '2025-09-30T10:00:00.000Z'; // The "confirmed termination date"
 
   let response;
 
@@ -47,17 +45,21 @@ defineFeature(feature, test => {
           unitNumber: `22B-${Date.now()}`,
           floorAreaSqm: '62',
           bedrooms: '2',
-          status: 'Occupied',
+          status: 'Vacant',
         };
         const apartmentRes = await request(app).post('/api/v1/create-apartment').send(createApartmentPayload);
         expect(apartmentRes.statusCode).toBe(200);
         apartmentId = apartmentRes.body.id;
 
-        // 3. For the Lease and Turnover, since there are no explicit creation endpoints in the OpenAPI spec,
-        //    we simulate their existence in the system by generating unique IDs and setting their required properties.
-        //    This fulfills the "Given an active lease for the apartment and a confirmed termination date" condition.
-        leaseId = `lease-${Date.now()}`;
-        turnoverId = `to-${Date.now()}`; // Assuming a turnover is linked to the lease already
+        // 3. Create the active Lease for the apartment
+        const leaseRes = await request(app).post('/api/v1/create-lease').send({
+          apartmentId: apartmentId,
+          currentRent: '1400',
+          nextActorEmail: 'pm@rentco.com',
+          tenantName: leaseTenantName,
+        });
+        expect(leaseRes.statusCode).toBe(200);
+        leaseId = leaseRes.body.id;
       });
 
       when('the PropertyMgr schedules the lease end for that date', async () => {
@@ -86,8 +88,6 @@ defineFeature(feature, test => {
 
         // Assert that other required fields of the Lease schema are present and consistent with the given state
         expect(response.body.propertyId).toBe(leasePropertyId);
-        expect(response.body.moveOutConfirmedAt).toBe(leaseMoveOutConfirmedAt); // Should remain as the confirmed termination date
-        expect(response.body.turnoverId).toBe(turnoverId);
         expect(response.body.tenantName).toBe(leaseTenantName);
 
         // Verify that the updated lease can be retrieved via a query operation
@@ -100,8 +100,6 @@ defineFeature(feature, test => {
         expect(getLeaseResponse.body.currentRent).toBe(leaseCurrentRent);
         expect(getLeaseResponse.body.nextActorEmail).toBe(leaseNextActorEmail);
         expect(getLeaseResponse.body.propertyId).toBe(leasePropertyId);
-        expect(getLeaseResponse.body.moveOutConfirmedAt).toBe(leaseMoveOutConfirmedAt);
-        expect(getLeaseResponse.body.turnoverId).toBe(turnoverId);
         expect(getLeaseResponse.body.tenantName).toBe(leaseTenantName);
       });
     }

@@ -23,7 +23,7 @@ defineFeature(feature, test => {
   test(
     'Given no property exists at the specified address and the PropertyMgr provides name, address, managerName, managerEmail and a positive unitsCount, When the PropertyMgr submits Create Property, Then Property Created is recorded with a new propertyId and the provided details, and the property becomes available to create apartments under it.',
     ({ given, when, then }) => {
-      given('no property exists at the specified address and the PropertyMgr provides name, address, managerName, managerEmail and a positive unitsCount', () => {
+      given('no property exists at the specified address and the PropertyMgr provides name, address, managerName, managerEmail and a positive unitsCount', async () => {
         createPropertyPayload = {
           name: PROPERTY_NAME,
           address: PROPERTY_ADDRESS,
@@ -31,3 +31,42 @@ defineFeature(feature, test => {
           managerEmail: MANAGER_EMAIL,
           unitsCount: UNITS_COUNT,
         };
+
+        const getAllPropertiesResponse = await request(app).get('/api/v1/get-all-propertys');
+        expect(getAllPropertiesResponse.statusCode).toBe(200);
+        expect(getAllPropertiesResponse.body.some(p => p.address === PROPERTY_ADDRESS)).toBe(false);
+      });
+
+      when('the PropertyMgr submits Create Property', async () => {
+        createPropertyResponse = await request(app)
+          .post('/api/v1/create-property')
+          .send(createPropertyPayload);
+      });
+
+      then('Property Created is recorded with a new propertyId and the provided details, and the property becomes available to create apartments under it.', async () => {
+        expect(createPropertyResponse.statusCode).toBe(200);
+        expect(typeof createPropertyResponse.body.id).toBe('string');
+        propertyId = createPropertyResponse.body.id;
+
+        expect(createPropertyResponse.body).toMatchObject(createPropertyPayload);
+
+        const getAllPropertiesResponse = await request(app).get('/api/v1/get-all-propertys');
+        expect(getAllPropertiesResponse.statusCode).toBe(200);
+        expect(getAllPropertiesResponse.body.find(p => p.id === propertyId)).toMatchObject(createPropertyPayload);
+
+        // The property is available to create apartments under it
+        const createApartmentResponse = await request(app)
+          .post('/api/v1/create-apartment')
+          .send({
+            propertyId,
+            unitNumber: '1A',
+            floorAreaSqm: '60',
+            bedrooms: '2',
+            status: 'Vacant',
+          });
+        expect(createApartmentResponse.statusCode).toBe(200);
+        expect(createApartmentResponse.body.propertyId).toBe(propertyId);
+      });
+    }
+  );
+});
