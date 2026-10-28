@@ -36,14 +36,23 @@ defineFeature(feature, test => {
           unitNumber: 'AUTOCMPLT101',
           floorAreaSqm: '75',
           bedrooms: '2',
-          status: 'Occupied'
+          status: 'Vacant'
         });
         expect(apartmentResponse.statusCode).toBe(200);
         apartmentId = apartmentResponse.body.id;
 
+        // Create Lease
+        const createLeaseResponse = await request(app).post('/api/v1/create-lease').send({
+          apartmentId: apartmentId,
+          currentRent: '1500',
+          nextActorEmail: 'ops@example.com',
+          tenantName: 'Jamie Fox'
+        });
+        expect(createLeaseResponse.statusCode).toBe(200);
+
         // Schedule Lease End
         const leaseResponse = await request(app).post('/api/v1/schedule-lease-end').send({
-          id: 'lease-autocmplttest-001',
+          id: createLeaseResponse.body.id,
           apartmentId: apartmentId,
           endDate: '2025-09-30',
           noticeDate: '2025-08-01',
@@ -65,7 +74,7 @@ defineFeature(feature, test => {
         turnoverId = createTurnoverResponse.body.id;
 
         // Mark Lease Ended
-        await request(app).post('/api/v1/mark-lease-ended').send({
+        const markLeaseEndedResponse = await request(app).post('/api/v1/mark-lease-ended').send({
           id: leaseId,
           apartmentId: apartmentId,
           endDate: '2025-09-30',
@@ -73,9 +82,10 @@ defineFeature(feature, test => {
           turnoverId: turnoverId,
           nextActorEmail: 'ops@example.com'
         });
+        expect(markLeaseEndedResponse.statusCode).toBe(200);
 
         // Record Apartment Vacated
-        await request(app).post('/api/v1/record-apartment-vacated').send({
+        const vacatedResponse = await request(app).post('/api/v1/record-apartment-vacated').send({
           id: turnoverId,
           apartmentId: apartmentId,
           vacatedAt: '2025-09-30T12:00:00.000Z',
@@ -83,6 +93,7 @@ defineFeature(feature, test => {
           notes: 'Tenant moved out cleanly.',
           nextActorEmail: 'inspections@example.com'
         });
+        expect(vacatedResponse.statusCode).toBe(200);
 
         // Schedule Inspection
         const scheduleInspectionResponse = await request(app).post('/api/v1/schedule-inspection').send({
@@ -97,7 +108,7 @@ defineFeature(feature, test => {
         inspectionId = scheduleInspectionResponse.body.id;
 
         // Complete Inspection without damages (to ensure no open work orders)
-        await request(app).post('/api/v1/complete-inspection').send({
+        const completeInspectionResponse = await request(app).post('/api/v1/complete-inspection').send({
           id: inspectionId,
           turnoverId: turnoverId,
           apartmentId: apartmentId,
@@ -107,9 +118,10 @@ defineFeature(feature, test => {
           photosUrl: 'https://photos.example.com/autocmplttest-insp-001',
           nextActorEmail: 'tenant@example.com'
         });
+        expect(completeInspectionResponse.statusCode).toBe(200);
 
         // Pass Final Inspection
-        await request(app).post('/api/v1/pass-final-inspection').send({
+        const passFinalInspectionResponse = await request(app).post('/api/v1/pass-final-inspection').send({
           id: inspectionId,
           turnoverId: turnoverId,
           apartmentId: apartmentId,
@@ -118,6 +130,7 @@ defineFeature(feature, test => {
           certificateUrl: 'https://docs.example.com/autocmplttest-cert-001',
           nextActorEmail: 'tenant@example.com'
         });
+        expect(passFinalInspectionResponse.statusCode).toBe(200);
 
         // Verify turnover state
         const initialTurnoverState = await request(app).get(`/api/v1/get-all-turnovers`);
@@ -149,7 +162,7 @@ defineFeature(feature, test => {
         const allApartmentsResponse = await request(app).get('/api/v1/get-all-apartments');
         const updatedApartment = allApartmentsResponse.body.find(a => a.id === apartmentId);
         expect(updatedApartment).toBeDefined();
-        expect(updatedApartment.status).toBe('Ready to Rent');
+        expect(updatedApartment.status).toBe('Ready');
       });
     }
   );

@@ -13,7 +13,7 @@ defineFeature(feature, test => {
   let response;
   let propertyId;
   let apartmentId;
-  const leaseId = 'lease-finalinsp-1001'; // ID provided in ScheduleLeaseEndRequest
+  let leaseId;
   let turnoverId;
   let inspectionId;
 
@@ -51,7 +51,16 @@ defineFeature(feature, test => {
         expect(response.statusCode).toBe(200);
         apartmentId = response.body.id;
 
-        // 3. Schedule Lease End (implicitly creates a lease)
+        // 3. Create a Lease and schedule its end
+        response = await request(app).post('/api/v1/create-lease').send({
+          apartmentId: apartmentId,
+          currentRent: '1600',
+          nextActorEmail: 'ops@rentco.com',
+          tenantName: 'Taylor Brooks',
+        });
+        expect(response.statusCode).toBe(200);
+        leaseId = response.body.id;
+
         const scheduleLeaseEndPayload = {
           id: leaseId,
           apartmentId: apartmentId,
@@ -62,7 +71,6 @@ defineFeature(feature, test => {
         };
         response = await request(app).post('/api/v1/schedule-lease-end').send(scheduleLeaseEndPayload);
         expect(response.statusCode).toBe(200);
-        // leaseId is already set from request
 
         // 4. Create Turnover
         const createTurnoverPayload = {

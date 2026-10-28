@@ -16,10 +16,14 @@ router.get('/:id', async (req, res) => {
     const responseData = {
       id: lease.id,
       apartmentId: lease.apartmentId,
-      tenantName: lease.tenantName,
+      endDate: lease.endDate,
       noticeDate: lease.noticeDate,
       currentRent: lease.currentRent,
       propertyId: lease.propertyId,
+      nextActorEmail: lease.nextActorEmail,
+      moveOutConfirmedAt: lease.moveOutConfirmedAt,
+      turnoverId: lease.turnoverId,
+      tenantName: lease.tenantName,
     };
 
     res.status(200).json(responseData);

@@ -15,7 +15,7 @@ defineFeature(feature, test => {
   let leaseId;
   let turnoverId;
   let inspectionId;
-  let inspectorNameFromGiven;
+  let assignedToEmailFromGiven;
   let completeInspectionResponse;
   let getInspectionByIdResponse;
 
@@ -51,8 +51,17 @@ defineFeature(feature, test => {
         expect(createApartmentRes.statusCode).toBe(200);
         apartmentId = createApartmentRes.body.id;
 
-        // 3. Schedule Lease End (to get a leaseId)
-        leaseId = `lease-${Date.now()}`;
+        // 3. Create a Lease and schedule its end
+        const createLeaseRes = await request(app)
+          .post('/api/v1/create-lease')
+          .send({
+            apartmentId: apartmentId,
+            currentRent: '1000',
+            nextActorEmail: 'ops@rentco.com',
+            tenantName: 'Robin Diaz'
+          });
+        expect(createLeaseRes.statusCode).toBe(200);
+        leaseId = createLeaseRes.body.id;
         const scheduleLeaseEndRes = await request(app)
           .post('/api/v1/schedule-lease-end')
           .send({
@@ -91,9 +100,9 @@ defineFeature(feature, test => {
           });
         expect(scheduleInspectionRes.statusCode).toBe(200);
         inspectionId = scheduleInspectionRes.body.id;
-        inspectorNameFromGiven = scheduleInspectionRes.body.inspectorName;
+        assignedToEmailFromGiven = scheduleInspectionRes.body.assignedToEmail;
         expect(inspectionId).toBeDefined();
-        expect(inspectorNameFromGiven).toBeDefined();
+        expect(assignedToEmailFromGiven).toBe('inspector1@rentco.com');
       });
 
       when('the Inspector records findings and marks the inspection complete', async () => {
@@ -121,7 +130,7 @@ defineFeature(feature, test => {
         expect(getInspectionByIdResponse.body.completedAt).toBe(CURRENT_DATE);
         expect(getInspectionByIdResponse.body.findingsSummary).toBe('Minor scuffs, water stain in bath');
         expect(getInspectionByIdResponse.body.hasDamages).toBe('true');
-        expect(getInspectionByIdResponse.body.inspectorName).toBe(inspectorNameFromGiven);
+        expect(getInspectionByIdResponse.body.assignedToEmail).toBe(assignedToEmailFromGiven);
       });
     }
   );

@@ -41,14 +41,22 @@ defineFeature(feature, test => {
           unitNumber: '1A',
           floorAreaSqm: '50',
           bedrooms: '1',
-          status: 'Occupied'
+          status: 'Vacant'
         });
         expect(response.statusCode).toBe(200);
         apartmentId = response.body.id;
 
-        // 3. Schedule Lease End (to get a leaseId for turnover)
+        // 3. Create a Lease and schedule its end (to get a leaseId for turnover)
+        response = await request(app).post('/api/v1/create-lease').send({
+          apartmentId: apartmentId,
+          currentRent: '1200',
+          nextActorEmail: 'ops@example.com',
+          tenantName: 'Pat Kim'
+        });
+        expect(response.statusCode).toBe(200);
+
         response = await request(app).post('/api/v1/schedule-lease-end').send({
-          id: 'lease-test-1',
+          id: response.body.id,
           apartmentId: apartmentId,
           endDate: '2025-08-31',
           noticeDate: '2025-07-01',
