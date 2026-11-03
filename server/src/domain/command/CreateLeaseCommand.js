@@ -2,9 +2,15 @@ import { v4 as uuidv4 } from 'uuid';
 import Lease from '../entity/Lease.js';
 import Apartment from '../entity/Apartment.js'; // Assuming this entity exists and has 'status' and 'propertyId' fields
 import db from '../../infrastructure/db/index.js';
+import { isValidDate } from '../service/RentLedger.js';
 
 class CreateLeaseCommand {
-  static async execute({ apartmentId, currentRent, nextActorEmail, tenantName }) {
+  static async execute({ apartmentId, currentRent, nextActorEmail, tenantName, startDate }) {
+    // The start date is optional; rent for the first month only counts the days from it.
+    if (startDate !== undefined && startDate !== '' && !isValidDate(startDate)) {
+      throw new Error('Start date must be a date in the form YYYY-MM-DD.');
+    }
+
     // GIVEN: a specific apartment is available for leasing (status is 'Vacant' or 'Ready')
     const apartment = await db.findById('Apartment', apartmentId);
 
@@ -24,6 +30,7 @@ class CreateLeaseCommand {
       currentRent,
       nextActorEmail,
       tenantName,
+      startDate: startDate || undefined,
       // propertyId needs to be extracted from the apartment as it's a field on Lease
       // Assuming Apartment entity has propertyId
       propertyId: apartment.propertyId,

@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.post('/', async (req, res) => {
   try {
-    const { apartmentId, currentRent, nextActorEmail, tenantName } = req.body;
+    const { apartmentId, currentRent, nextActorEmail, tenantName, startDate } = req.body;
     
     // Validate required fields based on OpenAPI specification's requestBody schema
     if (!apartmentId || !currentRent || !nextActorEmail || !tenantName) {
@@ -17,6 +17,7 @@ router.post('/', async (req, res) => {
       currentRent,
       nextActorEmail,
       tenantName,
+      startDate,
     });
     // OpenAPI spec defines 200 for a successful response.
     res.status(200).json(result);

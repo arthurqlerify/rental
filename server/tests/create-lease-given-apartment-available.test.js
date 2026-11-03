@@ -51,13 +51,14 @@ defineFeature(feature, test => {
         apartmentId = createApartmentResponse.body.id;
 
         // Prepare lease details from the PropertyMgr
-        // Note: OpenAPI CreateLeaseRequest does not include lease start/end date directly,
-        //       only currentRent, tenantName, nextActorEmail, and apartmentId.
+        // Note: OpenAPI CreateLeaseRequest takes the lease start date but not the end date,
+        //       which is set later by Schedule Lease End.
         createLeasePayload = {
           apartmentId: apartmentId,
           currentRent: '1500', // Example rent amount
           nextActorEmail: 'pm@rentco.com',
-          tenantName: 'John Tenant' // Example tenant details
+          tenantName: 'John Tenant', // Example tenant details
+          startDate: '2025-10-01' // Lease start date
         };
       });
 
@@ -88,6 +89,7 @@ defineFeature(feature, test => {
         expect(getLeaseResponse.body.id).toBe(newLeaseId);
         expect(getLeaseResponse.body.apartmentId).toBe(apartmentId);
         expect(getLeaseResponse.body.tenantName).toBe(createLeasePayload.tenantName);
+        expect(getLeaseResponse.body.startDate).toBe(createLeasePayload.startDate);
 
         // Assert Apartment status change
         const getApartmentsResponse = await request(app)
