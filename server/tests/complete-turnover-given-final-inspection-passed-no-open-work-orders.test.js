@@ -45,6 +45,8 @@ defineFeature(feature, test => {
         const createLeaseResponse = await request(app).post('/api/v1/create-lease').send({
           apartmentId: apartmentId,
           currentRent: '1500',
+          startDate: '2025-01-01',
+          endDate: '2025-12-31',
           nextActorEmail: 'ops@example.com',
           tenantName: 'Jamie Fox'
         });

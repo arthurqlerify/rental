@@ -4,7 +4,19 @@ import Apartment from '../entity/Apartment.js'; // Assuming this entity exists a
 import db from '../../infrastructure/db/index.js';
 
 class CreateLeaseCommand {
-  static async execute({ apartmentId, currentRent, nextActorEmail, tenantName }) {
+  static async execute({ apartmentId, currentRent, nextActorEmail, tenantName, startDate, endDate }) {
+    // GIVEN: the PropertyMgr provides the lease start date and end date, and the end date comes after the start date
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+      throw new Error('Lease start date and end date must be valid dates.');
+    }
+
+    if (end <= start) {
+      throw new Error('Lease end date must come after the start date.');
+    }
+
     // GIVEN: a specific apartment is available for leasing (status is 'Vacant' or 'Ready')
     const apartment = await db.findById('Apartment', apartmentId);
 
@@ -24,10 +36,12 @@ class CreateLeaseCommand {
       currentRent,
       nextActorEmail,
       tenantName,
+      startDate,
+      endDate,
       // propertyId needs to be extracted from the apartment as it's a field on Lease
       // Assuming Apartment entity has propertyId
       propertyId: apartment.propertyId,
-      // Other Lease fields (e.g., endDate, noticeDate, moveOutConfirmedAt, turnoverId)
+      // Other Lease fields (e.g., noticeDate, moveOutConfirmedAt, turnoverId)
       // are not provided by this command's input as per OpenAPI specification,
       // nor is there GWT logic to derive them for this specific command.
     });
