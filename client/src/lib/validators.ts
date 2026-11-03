@@ -10,7 +10,7 @@ export type Error = z.infer<typeof errorSchema>;
 export const leaseSchema = z.object({
   id: z.string().min(1, "ID is required"),
   apartmentId: z.string().min(1, "Apartment ID is required"),
-  startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Start date must be YYYY-MM-DD"),
+  startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Start date must be YYYY-MM-DD").optional(), // Leases created before start dates were recorded have none
   endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "End date must be YYYY-MM-DD"),
   noticeDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Notice date must be YYYY-MM-DD"),
   currentRent: z.string().regex(/^\d+(\.\d{1,2})?$/, "Current rent must be a valid number string"),
@@ -166,10 +166,10 @@ export const createLeaseRequestSchema = leaseSchema.pick({
   currentRent: true,
   tenantName: true,
   nextActorEmail: true,
-  startDate: true,
   endDate: true,
 }).extend({
   nextActorEmail: z.string().email("Invalid email format").optional(),
+  startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Start date must be YYYY-MM-DD"),
 }).refine((data) => data.endDate > data.startDate, {
   message: "End date must come after the start date",
   path: ["endDate"],

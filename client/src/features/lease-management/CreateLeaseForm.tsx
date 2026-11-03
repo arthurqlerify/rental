@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -134,7 +134,7 @@ export const CreateLeaseForm = ({ onSuccess }: CreateLeaseFormProps) => {
                       )}
                     >
                       {field.value ? (
-                        format(new Date(field.value), "PPP")
+                        format(parseISO(field.value), "PPP")
                       ) : (
                         <span>Pick a date</span>
                       )}
@@ -145,7 +145,7 @@ export const CreateLeaseForm = ({ onSuccess }: CreateLeaseFormProps) => {
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
-                    selected={field.value ? new Date(field.value) : undefined}
+                    selected={field.value ? parseISO(field.value) : undefined}
                     onSelect={(date) => field.onChange(date ? format(date, "yyyy-MM-dd") : "")}
                     disabled={(date) => date < new Date("1900-01-01")}
                     initialFocus
@@ -173,7 +173,7 @@ export const CreateLeaseForm = ({ onSuccess }: CreateLeaseFormProps) => {
                       )}
                     >
                       {field.value ? (
-                        format(new Date(field.value), "PPP")
+                        format(parseISO(field.value), "PPP")
                       ) : (
                         <span>Pick a date</span>
                       )}
@@ -184,7 +184,7 @@ export const CreateLeaseForm = ({ onSuccess }: CreateLeaseFormProps) => {
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
-                    selected={field.value ? new Date(field.value) : undefined}
+                    selected={field.value ? parseISO(field.value) : undefined}
                     onSelect={(date) => field.onChange(date ? format(date, "yyyy-MM-dd") : "")}
                     disabled={(date) =>
                       date < new Date("1900-01-01") ||
