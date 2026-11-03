@@ -50,6 +50,8 @@ export const CreateLeaseForm = ({ onSuccess }: CreateLeaseFormProps) => {
       currentRent: "",
       tenantName: "",
       nextActorEmail: "",
+      startDate: "",
+      endDate: "",
     },
   });
 
@@ -97,6 +99,32 @@ export const CreateLeaseForm = ({ onSuccess }: CreateLeaseFormProps) => {
               <FormLabel>Current Rent</FormLabel>
               <FormControl>
                 <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="startDate"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Start Date</FormLabel>
+              <FormControl>
+                <Input type="date" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="endDate"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>End Date</FormLabel>
+              <FormControl>
+                <Input type="date" min={form.watch("startDate") || undefined} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

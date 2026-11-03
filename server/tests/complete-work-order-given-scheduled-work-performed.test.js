@@ -51,7 +51,9 @@ defineFeature(feature, test => {
           apartmentId: apartmentId,
           currentRent: '1200',
           nextActorEmail: 'ops@example.com',
-          tenantName: 'Pat Kim'
+          tenantName: 'Pat Kim',
+          startDate: '2024-09-01',
+          endDate: '2025-08-31'
         });
         expect(response.statusCode).toBe(200);
 

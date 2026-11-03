@@ -59,6 +59,8 @@ defineFeature(feature, test => {
             currentRent: '1800',
             nextActorEmail: 'ops@rentco.com',
             tenantName: 'Morgan Ellis',
+            startDate: '2024-11-01',
+            endDate: '2025-10-31',
           });
         expect(createLeaseRes.statusCode).toBe(200);
         const scheduleLeaseEndRes = await request(app)

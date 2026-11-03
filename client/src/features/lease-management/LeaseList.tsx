@@ -33,6 +33,11 @@ const leaseColumns = (
     header: "Property ID",
   },
   {
+    accessorKey: "startDate",
+    header: "Start Date",
+    cell: (row: Lease) => row.startDate ? format(new Date(row.startDate), "PPP") : "N/A",
+  },
+  {
     accessorKey: "endDate",
     header: "End Date",
     cell: (row: Lease) => row.endDate ? format(new Date(row.endDate), "PPP") : "N/A",

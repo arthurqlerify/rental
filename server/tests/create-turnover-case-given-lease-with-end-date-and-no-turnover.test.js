@@ -58,6 +58,8 @@ defineFeature(feature, test => {
             currentRent: '1800',
             nextActorEmail: 'tenant@example.com',
             tenantName: 'Sam Lee',
+            startDate: '2024-10-01',
+            endDate: '2025-09-30',
           })
           .expect(200);
         leaseId = createLeaseRes.body.id;

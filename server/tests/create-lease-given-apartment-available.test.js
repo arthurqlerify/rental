@@ -51,13 +51,13 @@ defineFeature(feature, test => {
         apartmentId = createApartmentResponse.body.id;
 
         // Prepare lease details from the PropertyMgr
-        // Note: OpenAPI CreateLeaseRequest does not include lease start/end date directly,
-        //       only currentRent, tenantName, nextActorEmail, and apartmentId.
         createLeasePayload = {
           apartmentId: apartmentId,
           currentRent: '1500', // Example rent amount
           nextActorEmail: 'pm@rentco.com',
-          tenantName: 'John Tenant' // Example tenant details
+          tenantName: 'John Tenant', // Example tenant details
+          startDate: '2025-10-01',
+          endDate: '2026-09-30'
         };
       });
 
@@ -79,6 +79,8 @@ defineFeature(feature, test => {
         expect(createLeaseResponse.body.tenantName).toBe(createLeasePayload.tenantName);
         expect(createLeaseResponse.body.nextActorEmail).toBe(createLeasePayload.nextActorEmail);
         expect(createLeaseResponse.body.propertyId).toBe(propertyId); // propertyId should be derived from apartmentId
+        expect(createLeaseResponse.body.startDate).toBe(createLeasePayload.startDate);
+        expect(createLeaseResponse.body.endDate).toBe(createLeasePayload.endDate);
 
         // Retrieve the created lease to confirm
         const getLeaseResponse = await request(app)
@@ -88,6 +90,8 @@ defineFeature(feature, test => {
         expect(getLeaseResponse.body.id).toBe(newLeaseId);
         expect(getLeaseResponse.body.apartmentId).toBe(apartmentId);
         expect(getLeaseResponse.body.tenantName).toBe(createLeasePayload.tenantName);
+        expect(getLeaseResponse.body.startDate).toBe(createLeasePayload.startDate);
+        expect(getLeaseResponse.body.endDate).toBe(createLeasePayload.endDate);
 
         // Assert Apartment status change
         const getApartmentsResponse = await request(app)
@@ -100,6 +104,70 @@ defineFeature(feature, test => {
 
         expect(updatedApartment).toBeDefined();
         expect(updatedApartment.status).toBe('Occupied');
+      });
+    }
+  );
+
+  test(
+    "Given a specific apartment is available for leasing and the PropertyMgr provides a lease end date that is not after the start date, When the PropertyMgr submits Create Lease, Then the lease is rejected and the apartment stays available.",
+    ({ given, when, then }) => {
+      given('a specific apartment is available for leasing and the PropertyMgr provides a lease end date that is not after the start date', async () => {
+        const createPropertyResponse = await request(app)
+          .post('/api/v1/create-property')
+          .send({
+            name: 'Test Property for Lease Dates',
+            address: '456 Date St',
+            managerName: 'Jane Doe',
+            managerEmail: 'jane.doe@example.com',
+            unitsCount: '10'
+          });
+
+        expect(createPropertyResponse.statusCode).toBe(200);
+        propertyId = createPropertyResponse.body.id;
+
+        const createApartmentResponse = await request(app)
+          .post('/api/v1/create-apartment')
+          .send({
+            propertyId: propertyId,
+            unitNumber: '102',
+            floorAreaSqm: '75',
+            bedrooms: '2',
+            status: 'Vacant'
+          });
+
+        expect(createApartmentResponse.statusCode).toBe(200);
+        apartmentId = createApartmentResponse.body.id;
+
+        createLeasePayload = {
+          apartmentId: apartmentId,
+          currentRent: '1500',
+          nextActorEmail: 'pm@rentco.com',
+          tenantName: 'John Tenant',
+          startDate: '2026-09-30',
+          endDate: '2025-10-01'
+        };
+      });
+
+      when('the PropertyMgr submits Create Lease', async () => {
+        createLeaseResponse = await request(app)
+          .post('/api/v1/create-lease')
+          .send(createLeasePayload);
+      });
+
+      then('the lease is rejected and the apartment stays available.', async () => {
+        expect(createLeaseResponse.statusCode).toBe(400);
+        expect(createLeaseResponse.body.message).toBe('endDate must be after startDate.');
+
+        const getApartmentsResponse = await request(app)
+          .get('/api/v1/get-all-apartments');
+
+        expect(getApartmentsResponse.statusCode).toBe(200);
+        const apartment = getApartmentsResponse.body.find(
+          apt => apt.id === apartmentId
+        );
+
+        expect(apartment).toBeDefined();
+        expect(apartment.status).toBe('Vacant');
       });
     }
   );

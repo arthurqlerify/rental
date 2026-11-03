@@ -55,6 +55,8 @@ defineFeature(feature, test => {
           currentRent: '1800',
           nextActorEmail: 'ops@rentco.com',
           tenantName: 'Chris Park',
+          startDate: '2024-10-01',
+          endDate: '2025-09-30',
         });
         expect(createLeaseRes.statusCode).toBe(200);
         leaseId = createLeaseRes.body.id;

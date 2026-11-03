@@ -5,11 +5,11 @@ const router = express.Router();
 
 router.post('/', async (req, res) => {
   try {
-    const { apartmentId, currentRent, nextActorEmail, tenantName } = req.body;
-    
+    const { apartmentId, currentRent, nextActorEmail, tenantName, startDate, endDate } = req.body;
+
     // Validate required fields based on OpenAPI specification's requestBody schema
-    if (!apartmentId || !currentRent || !nextActorEmail || !tenantName) {
-      return res.status(400).json({ message: 'Missing required fields: apartmentId, currentRent, nextActorEmail, and tenantName are all required.' });
+    if (!apartmentId || !currentRent || !nextActorEmail || !tenantName || !startDate || !endDate) {
+      return res.status(400).json({ message: 'Missing required fields: apartmentId, currentRent, nextActorEmail, tenantName, startDate, and endDate are all required.' });
     }
 
     const result = await CreateLeaseCommand.execute({
@@ -17,6 +17,8 @@ router.post('/', async (req, res) => {
       currentRent,
       nextActorEmail,
       tenantName,
+      startDate,
+      endDate,
     });
     // OpenAPI spec defines 200 for a successful response.
     res.status(200).json(result);

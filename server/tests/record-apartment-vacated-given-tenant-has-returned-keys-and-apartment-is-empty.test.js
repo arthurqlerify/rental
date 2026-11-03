@@ -49,6 +49,8 @@ const setUpTurnover = async (address) => {
       currentRent: '1450',
       nextActorEmail: 'ops@rentco.com',
       tenantName: 'Alex Morgan',
+      startDate: '2024-10-01',
+      endDate: '2025-09-30',
     });
   expect(createLeaseRes.statusCode).toBe(200);
   expect(createLeaseRes.body.id).toBeDefined();

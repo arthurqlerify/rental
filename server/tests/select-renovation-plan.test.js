@@ -95,6 +95,8 @@ defineFeature(feature, test => {
             currentRent: LEASE_CURRENT_RENT,
             nextActorEmail: LEASE_NEXT_ACTOR_EMAIL,
             tenantName: LEASE_TENANT_NAME,
+            startDate: '2024-01-01',
+            endDate: LEASE_END_DATE,
           });
         expect(createLeaseRes.statusCode).toBe(200);
         LEASE_ID = createLeaseRes.body.id;
