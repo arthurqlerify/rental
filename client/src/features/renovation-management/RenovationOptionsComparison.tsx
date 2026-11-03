@@ -6,12 +6,20 @@ interface RenovationOptionsComparisonProps {
   renovationCase: RenovationCase;
 }
 
-const toNumber = (value?: string) => (value ? Number(value) : undefined);
+// The server stores estimates as given, so a blank or non-numeric value counts as missing.
+const toNumber = (value?: string) => {
+  const n = Number(value);
+  return value?.trim() && Number.isFinite(n) ? n : undefined;
+};
 
 const minOf = (values: (number | undefined)[]) => {
-  const present = values.filter((v): v is number => v !== undefined && !Number.isNaN(v));
+  const present = values.filter((v): v is number => v !== undefined);
   return present.length ? Math.min(...present) : undefined;
 };
+
+const formatCost = (cost: number) => cost.toLocaleString("en-US", { style: "currency", currency: "USD" });
+
+const formatLeadDays = (days: number) => `${days} ${days === 1 ? "day" : "days"}`;
 
 export const RenovationOptionsComparison = ({ renovationCase: c }: RenovationOptionsComparisonProps) => {
   const options = [
@@ -33,15 +41,17 @@ export const RenovationOptionsComparison = ({ renovationCase: c }: RenovationOpt
           <TableHead>Option</TableHead>
           <TableHead>Cost</TableHead>
           <TableHead>Lead time</TableHead>
-          <TableHead />
+          <TableHead>
+            <span className="sr-only">Highlights</span>
+          </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {options.map((o) => (
           <TableRow key={o.level}>
             <TableCell className="font-medium">{o.level}</TableCell>
-            <TableCell>{o.cost !== undefined ? `$${o.cost.toFixed(2)}` : "N/A"}</TableCell>
-            <TableCell>{o.leadDays !== undefined ? `${o.leadDays} days` : "N/A"}</TableCell>
+            <TableCell>{o.cost !== undefined ? formatCost(o.cost) : "N/A"}</TableCell>
+            <TableCell>{o.leadDays !== undefined ? formatLeadDays(o.leadDays) : "N/A"}</TableCell>
             <TableCell className="space-x-1">
               {o.cost !== undefined && o.cost === cheapest && <Badge>Cheapest</Badge>}
               {o.leadDays !== undefined && o.leadDays === fastest && <Badge variant="secondary">Fastest</Badge>}

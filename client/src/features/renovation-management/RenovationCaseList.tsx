@@ -90,7 +90,9 @@ const renovationCaseColumns = (
           variant="outline"
           size="sm"
           onClick={() => onCompareOptions(row)}
-          disabled={!row.costGood && !row.costBetter && !row.costPremium}
+          disabled={
+            ![row.costGood, row.costBetter, row.costPremium, row.leadDaysGood, row.leadDaysBetter, row.leadDaysPremium].some(Boolean)
+          } // Can compare once any cost or lead time is provided
         >
           <Columns className="mr-2 h-4 w-4" /> Compare Options
         </Button>
