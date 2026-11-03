@@ -95,6 +95,7 @@ jobs:
         continue-on-error: true
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CLAUDE_CODE_EFFORT_LEVEL: xhigh
           CARD_ID: ${{ inputs.card_id }}
           CARD_TITLE: ${{ inputs.title }}
           CARD_TEXT: ${{ inputs.prompt }}
