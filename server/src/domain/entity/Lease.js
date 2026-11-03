@@ -4,6 +4,7 @@ class Lease {
   constructor({
     id = uuidv4(),
     apartmentId,
+    startDate,
     endDate,
     noticeDate,
     currentRent,
@@ -15,6 +16,7 @@ class Lease {
   }) {
     this.id = id;
     this.apartmentId = apartmentId;
+    this.startDate = startDate;
     this.endDate = endDate;
     this.noticeDate = noticeDate;
     this.currentRent = currentRent;
@@ -29,6 +31,7 @@ class Lease {
     return {
       id: this.id,
       apartmentId: this.apartmentId,
+      startDate: this.startDate,
       endDate: this.endDate,
       noticeDate: this.noticeDate,
       currentRent: this.currentRent,

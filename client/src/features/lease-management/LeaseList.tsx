@@ -1,8 +1,10 @@
 import React from "react";
-import { Lease } from "@/lib/validators";
+import { Lease, LeaseBalance } from "@/lib/validators";
 import { DataTable } from "@/components/shared/DataTable";
 import { useGetAllLeases } from "@/api/leases";
-import { format } from "date-fns";
+import { useGetAllLeaseBalances } from "@/api/rent";
+import { LeaseBalanceSummary } from "@/features/rent-management/LeaseBalanceSummary";
+import { format, parseISO } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
 
@@ -13,7 +15,8 @@ interface LeaseListProps {
 
 const leaseColumns = (
   onScheduleLeaseEnd: (lease: Lease) => void,
-  onMarkLeaseEnded: (lease: Lease) => void
+  onMarkLeaseEnded: (lease: Lease) => void,
+  balances: Map<string, LeaseBalance>
 ): any[] => [
   {
     accessorKey: "id",
@@ -33,6 +36,11 @@ const leaseColumns = (
     header: "Property ID",
   },
   {
+    accessorKey: "startDate",
+    header: "Start Date",
+    cell: (row: Lease) => row.startDate ? format(parseISO(row.startDate), "PPP") : "N/A",
+  },
+  {
     accessorKey: "endDate",
     header: "End Date",
     cell: (row: Lease) => row.endDate ? format(new Date(row.endDate), "PPP") : "N/A",
@@ -40,6 +48,11 @@ const leaseColumns = (
   {
     accessorKey: "currentRent",
     header: "Rent",
+  },
+  {
+    accessorKey: "balance",
+    header: "Balance",
+    cell: (row: Lease) => <LeaseBalanceSummary balance={balances.get(row.id)} />,
   },
   {
     accessorKey: "noticeDate",
@@ -80,11 +93,12 @@ const leaseColumns = (
 
 export const LeaseList = ({ onScheduleLeaseEnd, onMarkLeaseEnded }: LeaseListProps) => {
   const { data: leases, isLoading, isError, error } = useGetAllLeases();
+  const { data: leaseBalances } = useGetAllLeaseBalances();
 
-  const columns = React.useMemo(
-    () => leaseColumns(onScheduleLeaseEnd, onMarkLeaseEnded),
-    [onScheduleLeaseEnd, onMarkLeaseEnded]
-  );
+  const columns = React.useMemo(() => {
+    const balances = new Map((leaseBalances ?? []).map((balance) => [balance.leaseId, balance]));
+    return leaseColumns(onScheduleLeaseEnd, onMarkLeaseEnded, balances);
+  }, [onScheduleLeaseEnd, onMarkLeaseEnded, leaseBalances]);
 
   return (
     <DataTable

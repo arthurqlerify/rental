@@ -576,6 +576,155 @@ paths:
                   $ref: '#/components/schemas/Property'
         '400':
           $ref: '#/components/responses/BadRequest'
+  /issue-rent-charges:
+    post:
+      summary: Issue Rent Charges
+      description: "Charges the month's rent to every lease that runs on at least one day of the month: one charge per lease, due on the 1st, for the lease's current rent. A lease that starts or ends during the month is charged only for the days it runs, and credit the lease has left goes to the new charge. A lease already charged for the month is not charged again and is listed in refused. When no lease could be charged the request is refused."
+      operationId: issueRentCharges
+      tags:
+        - RentalManagementService
+      responses:
+        '200':
+          description: 'OK: The charges were issued.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IssueRentChargesResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IssueRentChargesRequest'
+  /record-rent-payment:
+    post:
+      summary: Record Rent Payment
+      description: "Records a payment against a lease. Part payments are allowed. The payment pays the lease's oldest unpaid charge first, and anything paid beyond what is owed is kept as credit for the next charge."
+      operationId: recordRentPayment
+      tags:
+        - RentalManagementService
+      responses:
+        '200':
+          description: 'OK: The payment was recorded.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentPayment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordRentPaymentRequest'
+  /waive-rent-charge:
+    post:
+      summary: Waive Rent Charge
+      description: Waives what is still owed on a rent charge, with a reason. Nothing is owed for the charge afterwards.
+      operationId: waiveRentCharge
+      tags:
+        - RentalManagementService
+      responses:
+        '200':
+          description: 'OK: The charge was waived.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentCharge'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WaiveRentChargeRequest'
+  /get-all-rent-charges:
+    get:
+      summary: Get All Rent Charges
+      description: Lists rent charges with what is owed on each, overdue charges first and then the newest.
+      operationId: getAllRentCharges
+      tags:
+        - RentalManagementService
+      parameters:
+        - $ref: '#/components/parameters/RentPropertyIdFilter'
+        - $ref: '#/components/parameters/RentLeaseIdFilter'
+        - $ref: '#/components/parameters/RentAsOf'
+      responses:
+        '200':
+          description: Successful retrieval of data.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RentChargeView'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /get-all-rent-payments:
+    get:
+      summary: Get All Rent Payments
+      description: Lists rent payments, the newest first.
+      operationId: getAllRentPayments
+      tags:
+        - RentalManagementService
+      parameters:
+        - $ref: '#/components/parameters/RentPropertyIdFilter'
+        - $ref: '#/components/parameters/RentLeaseIdFilter'
+      responses:
+        '200':
+          description: Successful retrieval of data.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RentPayment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /get-all-lease-balances:
+    get:
+      summary: Get All Lease Balances
+      description: Lists each lease's rent balance (what is owed, what is overdue and any credit), overdue leases first.
+      operationId: getAllLeaseBalances
+      tags:
+        - RentalManagementService
+      parameters:
+        - $ref: '#/components/parameters/RentPropertyIdFilter'
+        - $ref: '#/components/parameters/RentLeaseIdFilter'
+        - $ref: '#/components/parameters/RentAsOf'
+      responses:
+        '200':
+          description: Successful retrieval of data.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaseBalance'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /get-rent-summary:
+    get:
+      summary: Get Rent Summary
+      description: Totals the outstanding and overdue rent across all leases and counts the overdue leases.
+      operationId: getRentSummary
+      tags:
+        - RentalManagementService
+      parameters:
+        - $ref: '#/components/parameters/RentAsOf'
+      responses:
+        '200':
+          description: Successful retrieval of data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentSummary'
+        '400':
+          $ref: '#/components/responses/BadRequest'
 components:
   schemas:
     Error:
@@ -596,6 +745,10 @@ components:
           type: string
           description: The apartmentId of the Lease.
           example: apt-22B
+        startDate:
+          type: string
+          description: The day the Lease starts (YYYY-MM-DD). Rent for the month it starts is charged from this day.
+          example: '2024-10-01'
         endDate:
           type: string
           description: The endDate of the Lease.
@@ -1559,6 +1712,10 @@ components:
         apartmentId:
           type: string
           example: apt-22B
+        startDate:
+          type: string
+          description: Optional. The day the lease starts (YYYY-MM-DD).
+          example: '2024-10-01'
         currentRent:
           type: string
           example: '1450'
@@ -1572,7 +1729,319 @@ components:
         - apartmentId
         - currentRent
         - tenantName
+    RentCharge:
+      type: object
+      description: One month's rent charged to a lease.
+      properties:
+        id:
+          type: string
+          example: 0b9c3c1e-6a43-4f0e-9a51-2f3a1c7d9e10
+        leaseId:
+          type: string
+          example: lease-1001
+        propertyId:
+          type: string
+          example: prop-001
+        apartmentId:
+          type: string
+          example: apt-22B
+        tenantName:
+          type: string
+          example: Alexandra Nguyen
+        month:
+          type: string
+          description: The month charged (YYYY-MM).
+          example: '2026-11'
+        dueDate:
+          type: string
+          description: The 1st of the month.
+          example: '2026-11-01'
+        periodStart:
+          type: string
+          description: The first day of the month the lease runs.
+          example: '2026-11-01'
+        periodEnd:
+          type: string
+          description: The last day of the month the lease runs.
+          example: '2026-11-30'
+        daysCharged:
+          type: integer
+          example: 30
+        daysInMonth:
+          type: integer
+          example: 30
+        monthlyRent:
+          type: number
+          description: The lease's current rent when the charge was issued.
+          example: 1450
+        amount:
+          type: number
+          description: The rent charged, for the days charged.
+          example: 1450
+        amountPaid:
+          type: number
+          description: What has been paid on the charge, credit included.
+          example: 0
+        creditApplied:
+          type: number
+          description: The lease's credit that went to the charge when it was issued.
+          example: 0
+        issuedAt:
+          type: string
+          example: '2026-11-01T08:00:00.000Z'
+        waivedAt:
+          type: string
+          example: '2026-11-04T09:30:00.000Z'
+        waivedReason:
+          type: string
+          example: No heating for most of November
+        waivedAmount:
+          type: number
+          description: What was still owed when the charge was waived.
+          example: 1450
+      required:
+        - id
+        - leaseId
+        - month
+        - dueDate
+        - amount
+        - amountPaid
+    RentChargeView:
+      description: A rent charge with what is owed on it, as of the day asked about.
+      allOf:
+        - $ref: '#/components/schemas/RentCharge'
+        - type: object
+          properties:
+            owed:
+              type: number
+              description: What is still owed. Nothing is owed on a waived charge.
+              example: 1450
+            overdueFrom:
+              type: string
+              description: The day the charge becomes overdue if it is not fully paid, 5 days after its due date.
+              example: '2026-11-06'
+            isOverdue:
+              type: boolean
+              example: false
+            status:
+              type: string
+              enum:
+                - Unpaid
+                - Part paid
+                - Overdue
+                - Paid
+                - Waived
+              example: Unpaid
+    RentPayment:
+      type: object
+      description: A payment recorded against a lease.
+      properties:
+        id:
+          type: string
+          example: 5d1f4a2b-3c6e-4d7f-8a9b-0c1d2e3f4a5b
+        leaseId:
+          type: string
+          example: lease-1001
+        propertyId:
+          type: string
+          example: prop-001
+        apartmentId:
+          type: string
+          example: apt-22B
+        tenantName:
+          type: string
+          example: Alexandra Nguyen
+        amount:
+          type: number
+          example: 1500
+        paidOn:
+          type: string
+          example: '2026-11-03'
+        method:
+          type: string
+          enum:
+            - BankTransfer
+            - Card
+            - Cash
+          example: BankTransfer
+        allocations:
+          type: array
+          description: The charges the payment paid, oldest first.
+          items:
+            type: object
+            properties:
+              chargeId:
+                type: string
+              month:
+                type: string
+                example: '2026-11'
+              amount:
+                type: number
+                example: 1450
+        creditAmount:
+          type: number
+          description: What was paid beyond what was owed, kept as credit for the next charge.
+          example: 50
+        recordedAt:
+          type: string
+          example: '2026-11-03T10:15:00.000Z'
+      required:
+        - id
+        - leaseId
+        - amount
+        - paidOn
+        - method
+        - allocations
+        - creditAmount
+    LeaseBalance:
+      type: object
+      description: A lease's rent balance, as of the day asked about.
+      properties:
+        leaseId:
+          type: string
+          example: lease-1001
+        tenantName:
+          type: string
+          example: Alexandra Nguyen
+        propertyId:
+          type: string
+          example: prop-001
+        apartmentId:
+          type: string
+          example: apt-22B
+        owed:
+          type: number
+          description: What is owed on all the lease's charges.
+          example: 1450
+        overdue:
+          type: number
+          description: The part of what is owed that is overdue.
+          example: 0
+        credit:
+          type: number
+          description: What was paid beyond what was owed, kept for the next charge.
+          example: 0
+        isOverdue:
+          type: boolean
+          example: false
+      required:
+        - leaseId
+        - owed
+        - overdue
+        - credit
+        - isOverdue
+    RentSummary:
+      type: object
+      properties:
+        asOf:
+          type: string
+          example: '2026-11-03'
+        totalOutstanding:
+          type: number
+          example: 4350
+        totalOverdue:
+          type: number
+          example: 1450
+        overdueLeaseCount:
+          type: integer
+          example: 1
+      required:
+        - asOf
+        - totalOutstanding
+        - totalOverdue
+        - overdueLeaseCount
+    IssueRentChargesRequest:
+      type: object
+      properties:
+        month:
+          type: string
+          description: The month to charge (YYYY-MM).
+          example: '2026-11'
+      required:
+        - month
+    IssueRentChargesResult:
+      type: object
+      properties:
+        month:
+          type: string
+          example: '2026-11'
+        issued:
+          type: array
+          items:
+            $ref: '#/components/schemas/RentCharge'
+        refused:
+          type: array
+          description: Active leases that were not charged, such as those already charged for the month.
+          items:
+            type: object
+            properties:
+              leaseId:
+                type: string
+              tenantName:
+                type: string
+              reason:
+                type: string
+                example: Rent for this month has already been charged.
+    RecordRentPaymentRequest:
+      type: object
+      properties:
+        leaseId:
+          type: string
+          example: lease-1001
+        amount:
+          type: string
+          description: A positive amount with at most two decimals, as a number or a number string.
+          example: '1500'
+        paidOn:
+          type: string
+          example: '2026-11-03'
+        method:
+          type: string
+          enum:
+            - BankTransfer
+            - Card
+            - Cash
+          example: BankTransfer
+      required:
+        - leaseId
+        - amount
+        - paidOn
+        - method
+    WaiveRentChargeRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The id of the rent charge.
+          example: 0b9c3c1e-6a43-4f0e-9a51-2f3a1c7d9e10
+        reason:
+          type: string
+          example: No heating for most of November
+      required:
+        - id
+        - reason
   parameters:
+    RentPropertyIdFilter:
+      name: propertyId
+      in: query
+      required: false
+      description: Only the rent of this property.
+      schema:
+        type: string
+    RentLeaseIdFilter:
+      name: leaseId
+      in: query
+      required: false
+      description: Only the rent of this lease.
+      schema:
+        type: string
+    RentAsOf:
+      name: asOf
+      in: query
+      required: false
+      description: The day overdue is judged on (YYYY-MM-DD). Defaults to today.
+      schema:
+        type: string
     LeaseId:
       name: id
       in: path

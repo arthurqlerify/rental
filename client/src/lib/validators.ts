@@ -10,6 +10,7 @@ export type Error = z.infer<typeof errorSchema>;
 export const leaseSchema = z.object({
   id: z.string().min(1, "ID is required"),
   apartmentId: z.string().min(1, "Apartment ID is required"),
+  startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Start date must be YYYY-MM-DD").optional(), // Leases created before start dates were recorded have none
   endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "End date must be YYYY-MM-DD"),
   noticeDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Notice date must be YYYY-MM-DD"),
   currentRent: z.string().regex(/^\d+(\.\d{1,2})?$/, "Current rent must be a valid number string"),
@@ -137,6 +138,78 @@ export const propertySchema = z.object({
 });
 export type Property = z.infer<typeof propertySchema>;
 
+export const paymentMethods = ["BankTransfer", "Card", "Cash"] as const;
+export type PaymentMethod = (typeof paymentMethods)[number];
+
+export const rentChargeSchema = z.object({
+  id: z.string(),
+  leaseId: z.string(),
+  propertyId: z.string(),
+  apartmentId: z.string(),
+  tenantName: z.string(),
+  month: z.string(), // YYYY-MM
+  dueDate: z.string(),
+  periodStart: z.string(),
+  periodEnd: z.string(),
+  daysCharged: z.number(),
+  daysInMonth: z.number(),
+  monthlyRent: z.number(),
+  amount: z.number(),
+  amountPaid: z.number(),
+  creditApplied: z.number(),
+  issuedAt: z.string(),
+  waivedAt: z.string().optional(),
+  waivedReason: z.string().optional(),
+  waivedAmount: z.number().optional(),
+  owed: z.number(),
+  overdueFrom: z.string(),
+  isOverdue: z.boolean(),
+  status: z.enum(["Unpaid", "Part paid", "Overdue", "Paid", "Waived"]),
+});
+export type RentCharge = z.infer<typeof rentChargeSchema>;
+
+export const rentPaymentSchema = z.object({
+  id: z.string(),
+  leaseId: z.string(),
+  propertyId: z.string(),
+  apartmentId: z.string(),
+  tenantName: z.string(),
+  amount: z.number(),
+  paidOn: z.string(),
+  method: z.enum(paymentMethods),
+  allocations: z.array(z.object({ chargeId: z.string(), month: z.string(), amount: z.number() })),
+  creditAmount: z.number(),
+  recordedAt: z.string(),
+});
+export type RentPayment = z.infer<typeof rentPaymentSchema>;
+
+export const leaseBalanceSchema = z.object({
+  leaseId: z.string(),
+  tenantName: z.string(),
+  propertyId: z.string(),
+  apartmentId: z.string(),
+  owed: z.number(),
+  overdue: z.number(),
+  credit: z.number(),
+  isOverdue: z.boolean(),
+});
+export type LeaseBalance = z.infer<typeof leaseBalanceSchema>;
+
+export const rentSummarySchema = z.object({
+  asOf: z.string(),
+  totalOutstanding: z.number(),
+  totalOverdue: z.number(),
+  overdueLeaseCount: z.number(),
+});
+export type RentSummary = z.infer<typeof rentSummarySchema>;
+
+export const issueRentChargesResultSchema = z.object({
+  month: z.string(),
+  issued: z.array(rentChargeSchema.omit({ owed: true, overdueFrom: true, isOverdue: true, status: true })),
+  refused: z.array(z.object({ leaseId: z.string(), tenantName: z.string(), reason: z.string() })),
+});
+export type IssueRentChargesResult = z.infer<typeof issueRentChargesResultSchema>;
+
 // --- Request Schemas ---
 
 export const scheduleLeaseEndRequestSchema = leaseSchema.pick({
@@ -166,6 +239,7 @@ export const createLeaseRequestSchema = leaseSchema.pick({
   tenantName: true,
   nextActorEmail: true,
 }).extend({
+  startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Start date is required"),
   nextActorEmail: z.string().email("Invalid email format").optional(),
 });
 export type CreateLeaseRequest = z.infer<typeof createLeaseRequestSchema>;
@@ -343,3 +417,25 @@ export const createApartmentRequestSchema = apartmentSchema.pick({
   status: true,
 });
 export type CreateApartmentRequest = z.infer<typeof createApartmentRequestSchema>;
+
+export const issueRentChargesRequestSchema = z.object({
+  month: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, "Month must be YYYY-MM"),
+});
+export type IssueRentChargesRequest = z.infer<typeof issueRentChargesRequestSchema>;
+
+export const recordRentPaymentRequestSchema = z.object({
+  leaseId: z.string().min(1, "Lease is required"),
+  amount: z
+    .string()
+    .regex(/^\d+(\.\d{1,2})?$/, "Amount must be a valid number string")
+    .refine((amount) => Number(amount) > 0, "Amount must be more than 0"),
+  paidOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Paid on must be YYYY-MM-DD"),
+  method: z.enum(paymentMethods),
+});
+export type RecordRentPaymentRequest = z.infer<typeof recordRentPaymentRequestSchema>;
+
+export const waiveRentChargeRequestSchema = z.object({
+  id: z.string().min(1, "Charge ID is required"),
+  reason: z.string().trim().min(1, "A reason is required"),
+});
+export type WaiveRentChargeRequest = z.infer<typeof waiveRentChargeRequestSchema>;
