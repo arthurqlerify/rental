@@ -9,6 +9,7 @@ import { CreateRenovationReportForm } from "@/features/renovation-management/Cre
 import { RequestRenovationEstimateForm } from "@/features/renovation-management/RequestRenovationEstimateForm";
 import { ProvideRenovationEstimateForm } from "@/features/renovation-management/ProvideRenovationEstimateForm";
 import { SelectRenovationPlanForm } from "@/features/renovation-management/SelectRenovationPlanForm";
+import { RenovationOptionsComparison } from "@/features/renovation-management/RenovationOptionsComparison";
 import { CreateWorkOrderForm } from "@/features/work-order-management/CreateWorkOrderForm"; // Linked action
 
 const RenovationCasesPage = () => {
@@ -17,6 +18,7 @@ const RenovationCasesPage = () => {
   const [isProvideRenovationEstimateFormOpen, setIsProvideRenovationEstimateFormOpen] = useState(false);
   const [isSelectRenovationPlanFormOpen, setIsSelectRenovationPlanFormOpen] = useState(false);
   const [isCreateWorkOrderFormOpen, setIsCreateWorkOrderFormOpen] = useState(false); // For post-plan work order creation
+  const [isCompareOptionsOpen, setIsCompareOptionsOpen] = useState(false);
   const [selectedRenovationCase, setSelectedRenovationCase] = useState<RenovationCase | undefined>(undefined);
 
   const handleCreateRenovationReport = (caseItem: RenovationCase) => {
@@ -37,6 +39,11 @@ const RenovationCasesPage = () => {
   const handleSelectRenovationPlan = (caseItem: RenovationCase) => {
     setSelectedRenovationCase(caseItem);
     setIsSelectRenovationPlanFormOpen(true);
+  };
+
+  const handleCompareOptions = (caseItem: RenovationCase) => {
+    setSelectedRenovationCase(caseItem);
+    setIsCompareOptionsOpen(true);
   };
 
   const handleCreateWorkOrder = (renovationCase: RenovationCase) => {
@@ -79,7 +86,20 @@ const RenovationCasesPage = () => {
         onRequestRenovationEstimate={handleRequestRenovationEstimate}
         onProvideRenovationEstimate={handleProvideRenovationEstimate}
         onSelectRenovationPlan={handleSelectRenovationPlan}
+        onCompareOptions={handleCompareOptions}
       />
+
+      <Dialog open={isCompareOptionsOpen} onOpenChange={setIsCompareOptionsOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Compare Renovation Options</DialogTitle>
+            <DialogDescription>
+              Good, better and premium estimates side by side.
+            </DialogDescription>
+          </DialogHeader>
+          {selectedRenovationCase && <RenovationOptionsComparison renovationCase={selectedRenovationCase} />}
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={isCreateRenovationReportFormOpen} onOpenChange={setIsCreateRenovationReportFormOpen}>
         <DialogContent className="sm:max-w-[425px]">
