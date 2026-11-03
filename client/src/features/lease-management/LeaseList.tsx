@@ -1,7 +1,10 @@
 import React from "react";
-import { Lease } from "@/lib/validators";
+import { Lease, LeaseBalance } from "@/lib/validators";
 import { DataTable } from "@/components/shared/DataTable";
 import { useGetAllLeases } from "@/api/leases";
+import { useGetAllLeaseBalances } from "@/api/rent";
+import { formatMoney } from "@/features/rent-management/formatRent";
+import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
@@ -13,7 +16,8 @@ interface LeaseListProps {
 
 const leaseColumns = (
   onScheduleLeaseEnd: (lease: Lease) => void,
-  onMarkLeaseEnded: (lease: Lease) => void
+  onMarkLeaseEnded: (lease: Lease) => void,
+  balances: Map<string, LeaseBalance>
 ): any[] => [
   {
     accessorKey: "id",
@@ -33,6 +37,11 @@ const leaseColumns = (
     header: "Property ID",
   },
   {
+    accessorKey: "startDate",
+    header: "Start Date",
+    cell: (row: Lease) => row.startDate ? format(new Date(row.startDate), "PPP") : "N/A",
+  },
+  {
     accessorKey: "endDate",
     header: "End Date",
     cell: (row: Lease) => row.endDate ? format(new Date(row.endDate), "PPP") : "N/A",
@@ -40,6 +49,25 @@ const leaseColumns = (
   {
     accessorKey: "currentRent",
     header: "Rent",
+  },
+  {
+    accessorKey: "balance",
+    header: "Balance",
+    cell: (row: Lease) => {
+      const balance = balances.get(row.id);
+      if (!balance) return "N/A";
+      return (
+        <div className="space-y-1">
+          <div>{formatMoney(balance.owed)} owed</div>
+          {balance.status === "Overdue" && (
+            <Badge variant="destructive">{formatMoney(balance.overdue)} overdue</Badge>
+          )}
+          {balance.status === "In credit" && (
+            <div className="text-xs text-muted-foreground">{formatMoney(balance.credit)} credit</div>
+          )}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "noticeDate",
@@ -80,10 +108,16 @@ const leaseColumns = (
 
 export const LeaseList = ({ onScheduleLeaseEnd, onMarkLeaseEnded }: LeaseListProps) => {
   const { data: leases, isLoading, isError, error } = useGetAllLeases();
+  const { data: balances } = useGetAllLeaseBalances();
+
+  const balanceByLease = React.useMemo(
+    () => new Map((balances ?? []).map((balance) => [balance.leaseId, balance])),
+    [balances]
+  );
 
   const columns = React.useMemo(
-    () => leaseColumns(onScheduleLeaseEnd, onMarkLeaseEnded),
-    [onScheduleLeaseEnd, onMarkLeaseEnded]
+    () => leaseColumns(onScheduleLeaseEnd, onMarkLeaseEnded, balanceByLease),
+    [onScheduleLeaseEnd, onMarkLeaseEnded, balanceByLease]
   );
 
   return (

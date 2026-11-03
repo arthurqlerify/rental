@@ -8,7 +8,8 @@ import {
   Hammer,
   ClipboardList,
   Building,
-  House
+  House,
+  Banknote
 } from "lucide-react";
 
 interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
@@ -35,6 +36,11 @@ const sidebarNavItems = [
     title: "Leases",
     href: "/leases",
     icon: FileText,
+  },
+  {
+    title: "Rent",
+    href: "/rent",
+    icon: Banknote,
   },
   {
     title: "Turnovers",

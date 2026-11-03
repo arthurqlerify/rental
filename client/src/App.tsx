@@ -13,6 +13,7 @@ import RenovationCasesPage from "./pages/RenovationCasesPage";
 import WorkOrdersPage from "./pages/WorkOrdersPage";
 import ApartmentsPage from "./pages/ApartmentsPage";
 import PropertiesPage from "./pages/PropertiesPage";
+import RentPage from "./pages/RentPage";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/" element={<Index />}>
             <Route index element={<Dashboard />} />
             <Route path="leases" element={<LeasesPage />} />
+            <Route path="rent" element={<RentPage />} />
             <Route path="turnovers" element={<TurnoversPage />} />
             <Route path="inspections" element={<InspectionsPage />} />
             <Route path="renovation-cases" element={<RenovationCasesPage />} />
