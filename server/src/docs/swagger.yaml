@@ -596,6 +596,10 @@ components:
           type: string
           description: The apartmentId of the Lease.
           example: apt-22B
+        startDate:
+          type: string
+          description: The startDate of the Lease.
+          example: '2024-10-01'
         endDate:
           type: string
           description: The endDate of the Lease.
@@ -1568,10 +1572,20 @@ components:
         tenantName:
           type: string
           example: Alexandra Nguyen
+        startDate:
+          type: string
+          description: The first day of the lease. Must come before endDate.
+          example: '2024-10-01'
+        endDate:
+          type: string
+          description: The last day of the lease. Must come after startDate.
+          example: '2025-09-30'
       required:
         - apartmentId
         - currentRent
         - tenantName
+        - startDate
+        - endDate
   parameters:
     LeaseId:
       name: id

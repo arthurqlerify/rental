@@ -16,6 +16,7 @@ router.get('/:id', async (req, res) => {
     const responseData = {
       id: lease.id,
       apartmentId: lease.apartmentId,
+      startDate: lease.startDate,
       endDate: lease.endDate,
       noticeDate: lease.noticeDate,
       currentRent: lease.currentRent,

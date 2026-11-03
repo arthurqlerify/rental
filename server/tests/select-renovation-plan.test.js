@@ -93,6 +93,8 @@ defineFeature(feature, test => {
           .send({
             apartmentId: APARTMENT_ID,
             currentRent: LEASE_CURRENT_RENT,
+            startDate: '2025-01-01',
+            endDate: '2025-12-31',
             nextActorEmail: LEASE_NEXT_ACTOR_EMAIL,
             tenantName: LEASE_TENANT_NAME,
           });
