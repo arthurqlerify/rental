@@ -769,8 +769,8 @@ components:
           example: apt-22B
         startDate:
           type: string
-          description: The day the lease starts. Rent for a month the lease starts in only counts the days from it.
-          example: '2025-04-01'
+          description: The first day of the lease. Rent for the month the lease starts in only counts the days from it.
+          example: '2024-10-01'
         endDate:
           type: string
           description: The endDate of the Lease.
@@ -1745,12 +1745,18 @@ components:
           example: Alexandra Nguyen
         startDate:
           type: string
-          description: Optional. The day the lease starts, as YYYY-MM-DD.
-          example: '2025-04-01'
+          description: The first day of the lease. Must come before endDate.
+          example: '2024-10-01'
+        endDate:
+          type: string
+          description: The last day of the lease. Must come after startDate.
+          example: '2025-09-30'
       required:
         - apartmentId
         - currentRent
         - tenantName
+        - startDate
+        - endDate
     RentCharge:
       type: object
       description: One month's rent charged to a lease. Amounts are strings with two decimals.

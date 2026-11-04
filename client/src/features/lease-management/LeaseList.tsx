@@ -5,7 +5,7 @@ import { useGetAllLeases } from "@/api/leases";
 import { useGetAllLeaseBalances } from "@/api/rent";
 import { formatMoney } from "@/features/rent-management/formatRent";
 import { Badge } from "@/components/ui/badge";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
 
@@ -39,12 +39,13 @@ const leaseColumns = (
   {
     accessorKey: "startDate",
     header: "Start Date",
-    cell: (row: Lease) => row.startDate ? format(new Date(row.startDate), "PPP") : "N/A",
+    // parseISO reads "YYYY-MM-DD" as a local day; new Date() reads it as UTC and shows the day before west of UTC
+    cell: (row: Lease) => row.startDate ? format(parseISO(row.startDate), "PPP") : "N/A",
   },
   {
     accessorKey: "endDate",
     header: "End Date",
-    cell: (row: Lease) => row.endDate ? format(new Date(row.endDate), "PPP") : "N/A",
+    cell: (row: Lease) => row.endDate ? format(parseISO(row.endDate), "PPP") : "N/A",
   },
   {
     accessorKey: "currentRent",

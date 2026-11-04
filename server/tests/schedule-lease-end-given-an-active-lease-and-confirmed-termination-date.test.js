@@ -55,6 +55,8 @@ defineFeature(feature, test => {
         const leaseRes = await request(app).post('/api/v1/create-lease').send({
           apartmentId: apartmentId,
           currentRent: '1400',
+          startDate: '2025-01-01',
+          endDate: '2025-12-31',
           nextActorEmail: 'pm@rentco.com',
           tenantName: leaseTenantName,
         });

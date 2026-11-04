@@ -2,13 +2,19 @@ import { v4 as uuidv4 } from 'uuid';
 import Lease from '../entity/Lease.js';
 import Apartment from '../entity/Apartment.js'; // Assuming this entity exists and has 'status' and 'propertyId' fields
 import db from '../../infrastructure/db/index.js';
-import { isValidDate } from '../service/RentLedger.js';
 
 class CreateLeaseCommand {
-  static async execute({ apartmentId, currentRent, nextActorEmail, tenantName, startDate }) {
-    // The start date is optional; rent for the first month only counts the days from it.
-    if (startDate !== undefined && startDate !== '' && !isValidDate(startDate)) {
-      throw new Error('Start date must be a date in the form YYYY-MM-DD.');
+  static async execute({ apartmentId, currentRent, nextActorEmail, tenantName, startDate, endDate }) {
+    // GIVEN: the PropertyMgr provides the lease start date and end date, and the end date comes after the start date
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+      throw new Error('Lease start date and end date must be valid dates.');
+    }
+
+    if (end <= start) {
+      throw new Error('Lease end date must come after the start date.');
     }
 
     // GIVEN: a specific apartment is available for leasing (status is 'Vacant' or 'Ready')
@@ -30,11 +36,12 @@ class CreateLeaseCommand {
       currentRent,
       nextActorEmail,
       tenantName,
-      startDate: startDate || undefined,
+      startDate,
+      endDate,
       // propertyId needs to be extracted from the apartment as it's a field on Lease
       // Assuming Apartment entity has propertyId
       propertyId: apartment.propertyId,
-      // Other Lease fields (e.g., endDate, noticeDate, moveOutConfirmedAt, turnoverId)
+      // Other Lease fields (e.g., noticeDate, moveOutConfirmedAt, turnoverId)
       // are not provided by this command's input as per OpenAPI specification,
       // nor is there GWT logic to derive them for this specific command.
     });

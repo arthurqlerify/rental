@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -51,6 +51,7 @@ export const CreateLeaseForm = ({ onSuccess }: CreateLeaseFormProps) => {
       tenantName: "",
       nextActorEmail: "",
       startDate: "",
+      endDate: "",
     },
   });
 
@@ -105,6 +106,19 @@ export const CreateLeaseForm = ({ onSuccess }: CreateLeaseFormProps) => {
         />
         <FormField
           control={form.control}
+          name="tenantName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Tenant Name</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
           name="startDate"
           render={({ field }) => (
             <FormItem className="flex flex-col">
@@ -120,7 +134,7 @@ export const CreateLeaseForm = ({ onSuccess }: CreateLeaseFormProps) => {
                       )}
                     >
                       {field.value ? (
-                        format(new Date(field.value), "PPP")
+                        format(parseISO(field.value), "PPP")
                       ) : (
                         <span>Pick a date</span>
                       )}
@@ -131,8 +145,9 @@ export const CreateLeaseForm = ({ onSuccess }: CreateLeaseFormProps) => {
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
-                    selected={field.value ? new Date(field.value) : undefined}
+                    selected={field.value ? parseISO(field.value) : undefined}
                     onSelect={(date) => field.onChange(date ? format(date, "yyyy-MM-dd") : "")}
+                    disabled={(date) => date < new Date("1900-01-01")}
                     initialFocus
                   />
                 </PopoverContent>
@@ -143,13 +158,42 @@ export const CreateLeaseForm = ({ onSuccess }: CreateLeaseFormProps) => {
         />
         <FormField
           control={form.control}
-          name="tenantName"
+          name="endDate"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Tenant Name</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
+            <FormItem className="flex flex-col">
+              <FormLabel>End Date</FormLabel>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-full pl-3 text-left font-normal",
+                        !field.value && "text-muted-foreground"
+                      )}
+                    >
+                      {field.value ? (
+                        format(parseISO(field.value), "PPP")
+                      ) : (
+                        <span>Pick a date</span>
+                      )}
+                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={field.value ? parseISO(field.value) : undefined}
+                    onSelect={(date) => field.onChange(date ? format(date, "yyyy-MM-dd") : "")}
+                    disabled={(date) =>
+                      date < new Date("1900-01-01") ||
+                      (!!form.watch("startDate") && format(date, "yyyy-MM-dd") <= form.watch("startDate"))
+                    }
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
               <FormMessage />
             </FormItem>
           )}

@@ -20,9 +20,17 @@ export async function createProperty() {
   return response.body.id;
 }
 
-// Creates an active lease. With endDate, the lease end is scheduled for that date; with
-// ended: true, the lease is also marked ended on it.
-export async function createLease({ propertyId, tenantName, currentRent, startDate, endDate, ended = false }) {
+// Creates an active lease. Create Lease needs a start and an end date, so a lease given neither
+// runs from 2025-01-01 to 2030-12-31, which covers every month these scenarios charge. With
+// ended: true, the lease is also marked ended on its end date.
+export async function createLease({
+  propertyId,
+  tenantName,
+  currentRent,
+  startDate = '2025-01-01',
+  endDate = '2030-12-31',
+  ended = false
+}) {
   unitCount += 1;
   const apartmentResponse = await request(app)
     .post('/api/v1/create-apartment')
@@ -42,24 +50,11 @@ export async function createLease({ propertyId, tenantName, currentRent, startDa
       currentRent,
       nextActorEmail: 'pm@rentco.com',
       tenantName,
-      startDate
+      startDate,
+      endDate
     });
   expect(leaseResponse.statusCode).toBe(200);
   const lease = leaseResponse.body;
-
-  if (endDate) {
-    const scheduleResponse = await request(app)
-      .post('/api/v1/schedule-lease-end')
-      .send({
-        id: lease.id,
-        apartmentId: lease.apartmentId,
-        endDate,
-        noticeDate: '2025-06-01',
-        currentRent,
-        nextActorEmail: 'pm@rentco.com'
-      });
-    expect(scheduleResponse.statusCode).toBe(200);
-  }
 
   if (ended) {
     const endedResponse = await request(app)

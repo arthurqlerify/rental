@@ -50,15 +50,14 @@ defineFeature(feature, test => {
         expect(createApartmentResponse.statusCode).toBe(200);
         apartmentId = createApartmentResponse.body.id;
 
-        // Prepare lease details from the PropertyMgr
-        // Note: OpenAPI CreateLeaseRequest takes the lease start date but not the end date,
-        //       which is set later by Schedule Lease End.
+        // Prepare lease details from the PropertyMgr: tenant details, lease start date, end date, and rent amount
         createLeasePayload = {
           apartmentId: apartmentId,
           currentRent: '1500', // Example rent amount
           nextActorEmail: 'pm@rentco.com',
           tenantName: 'John Tenant', // Example tenant details
-          startDate: '2025-10-01' // Lease start date
+          startDate: '2025-10-01',
+          endDate: '2026-09-30'
         };
       });
 
@@ -79,6 +78,8 @@ defineFeature(feature, test => {
         expect(createLeaseResponse.body.currentRent).toBe(createLeasePayload.currentRent);
         expect(createLeaseResponse.body.tenantName).toBe(createLeasePayload.tenantName);
         expect(createLeaseResponse.body.nextActorEmail).toBe(createLeasePayload.nextActorEmail);
+        expect(createLeaseResponse.body.startDate).toBe(createLeasePayload.startDate);
+        expect(createLeaseResponse.body.endDate).toBe(createLeasePayload.endDate);
         expect(createLeaseResponse.body.propertyId).toBe(propertyId); // propertyId should be derived from apartmentId
 
         // Retrieve the created lease to confirm
@@ -90,6 +91,17 @@ defineFeature(feature, test => {
         expect(getLeaseResponse.body.apartmentId).toBe(apartmentId);
         expect(getLeaseResponse.body.tenantName).toBe(createLeasePayload.tenantName);
         expect(getLeaseResponse.body.startDate).toBe(createLeasePayload.startDate);
+        expect(getLeaseResponse.body.endDate).toBe(createLeasePayload.endDate);
+
+        // The lease list shows both dates
+        const getAllLeasesResponse = await request(app)
+          .get('/api/v1/get-all-leases');
+
+        expect(getAllLeasesResponse.statusCode).toBe(200);
+        const listedLease = getAllLeasesResponse.body.find(lease => lease.id === newLeaseId);
+        expect(listedLease).toBeDefined();
+        expect(listedLease.startDate).toBe(createLeasePayload.startDate);
+        expect(listedLease.endDate).toBe(createLeasePayload.endDate);
 
         // Assert Apartment status change
         const getApartmentsResponse = await request(app)
