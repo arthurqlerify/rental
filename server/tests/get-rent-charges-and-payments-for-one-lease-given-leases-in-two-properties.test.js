@@ -8,7 +8,7 @@ import { createProperty, createLease } from './support/rentFixtures.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const feature = loadFeature(path.resolve(__dirname, 'get-rent-charges-and-payments-given-leases-in-several-properties.feature'));
+const feature = loadFeature(path.resolve(__dirname, 'get-rent-charges-and-payments-for-one-lease-given-leases-in-two-properties.feature'));
 
 const AS_OF = '2025-10-03';
 
@@ -60,28 +60,6 @@ const viewRentList = async (query) => {
 
 defineFeature(feature, test => {
   test(
-    "Given rent charges and payments for leases in two properties, When the PropertyMgr narrows the rent list to one property, Then only that property's charges and payments are listed.",
-    ({ given, when, then }) => {
-      let setup;
-      let view;
-
-      given('rent charges and payments for leases in two properties', async () => {
-        setup = await givenTwoProperties();
-      });
-
-      when('the PropertyMgr narrows the rent list to one property', async () => {
-        view = await viewRentList({ propertyId: setup.propertyAId });
-      });
-
-      then("only that property's charges and payments are listed.", () => {
-        expect(ids(view.charges)).toEqual(ids(setup.charges.slice(0, 2)));
-        expect(ids(view.payments)).toEqual(ids(setup.payments.slice(0, 1)));
-        expect(view.balances.map(b => b.leaseId).sort()).toEqual([setup.paidLease.id, setup.unpaidLease.id].sort());
-      });
-    }
-  );
-
-  test(
     "Given rent charges and payments for leases in two properties, When the PropertyMgr narrows the rent list to one lease, Then only that lease's charges and payments are listed.",
     ({ given, when, then }) => {
       let setup;
@@ -100,39 +78,6 @@ defineFeature(feature, test => {
         expect(ids(view.payments)).toEqual(ids(setup.payments.slice(1)));
         expect(view.balances).toHaveLength(1);
         expect(view.balances[0]).toMatchObject({ leaseId: setup.partLease.id, owed: '1900.00', overdue: '700.00' });
-      });
-    }
-  );
-
-  test(
-    'Given rent charges and payments for leases in two properties, When the PropertyMgr views the whole rent list, Then every charge and payment is listed with overdue charges and overdue leases first.',
-    ({ given, when, then }) => {
-      let setup;
-      let view;
-
-      given('rent charges and payments for leases in two properties', async () => {
-        setup = await givenTwoProperties();
-      });
-
-      when('the PropertyMgr views the whole rent list', async () => {
-        view = await viewRentList({});
-      });
-
-      then('every charge and payment is listed with overdue charges and overdue leases first.', () => {
-        expect(ids(view.charges)).toEqual(expect.arrayContaining(ids(setup.charges)));
-        expect(ids(view.payments)).toEqual(expect.arrayContaining(ids(setup.payments)));
-
-        const firstNotOverdueCharge = view.charges.findIndex(charge => !charge.overdue);
-        const lastOverdueCharge = view.charges.map(charge => charge.overdue).lastIndexOf(true);
-        expect(lastOverdueCharge).toBeGreaterThanOrEqual(0);
-        expect(lastOverdueCharge).toBeLessThan(firstNotOverdueCharge);
-
-        const firstNotOverdueLease = view.balances.findIndex(balance => balance.status !== 'Overdue');
-        const lastOverdueLease = view.balances.map(balance => balance.status).lastIndexOf('Overdue');
-        expect(lastOverdueLease).toBeGreaterThanOrEqual(0);
-        expect(lastOverdueLease).toBeLessThan(firstNotOverdueLease);
-        expect(view.balances.find(b => b.leaseId === setup.unpaidLease.id).status).toBe('Overdue');
-        expect(view.balances.find(b => b.leaseId === setup.paidLease.id).status).toBe('Paid up');
       });
     }
   );

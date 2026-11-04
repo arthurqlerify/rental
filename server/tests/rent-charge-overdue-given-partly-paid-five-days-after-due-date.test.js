@@ -8,7 +8,7 @@ import { createProperty, createLease } from './support/rentFixtures.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const feature = loadFeature(path.resolve(__dirname, 'rent-charge-overdue-given-not-fully-paid-five-days-after-due-date.feature'));
+const feature = loadFeature(path.resolve(__dirname, 'rent-charge-overdue-given-partly-paid-five-days-after-due-date.feature'));
 
 // The September charge is due on 2025-09-01, so it is overdue from 2025-09-06.
 const MONTH = '2025-09';
@@ -61,53 +61,6 @@ defineFeature(feature, test => {
           overdueFrom: '2025-09-06'
         });
         expect(view.balance).toMatchObject({ owed: '700.00', overdue: '700.00', status: 'Overdue' });
-      });
-    }
-  );
-
-  test(
-    'Given an unpaid rent charge, When fewer than 5 days have passed since its due date, Then the charge is owed but not yet overdue.',
-    ({ given, when, then }) => {
-      let lease;
-      let view;
-
-      given('an unpaid rent charge', async () => {
-        const propertyId = await createProperty();
-        lease = await createLease({ propertyId, tenantName: 'Marcus Lee', currentRent: '1000' });
-        await chargeRent(lease.id);
-      });
-
-      when('fewer than 5 days have passed since its due date', async () => {
-        view = await viewOn(lease.id, '2025-09-05');
-      });
-
-      then('the charge is owed but not yet overdue.', () => {
-        expect(view.charge).toMatchObject({ outstanding: '1000.00', status: 'Unpaid', overdue: false });
-        expect(view.balance).toMatchObject({ owed: '1000.00', overdue: '0.00', status: 'Owing' });
-      });
-    }
-  );
-
-  test(
-    'Given a rent charge that was paid in full after its due date, When more than 5 days have passed since its due date, Then the charge is not overdue.',
-    ({ given, when, then }) => {
-      let lease;
-      let view;
-
-      given('a rent charge that was paid in full after its due date', async () => {
-        const propertyId = await createProperty();
-        lease = await createLease({ propertyId, tenantName: 'Priya Shah', currentRent: '1000' });
-        await chargeRent(lease.id);
-        await recordPayment(lease.id, '1000', '2025-09-12');
-      });
-
-      when('more than 5 days have passed since its due date', async () => {
-        view = await viewOn(lease.id, '2025-09-20');
-      });
-
-      then('the charge is not overdue.', () => {
-        expect(view.charge).toMatchObject({ outstanding: '0.00', status: 'Paid', overdue: false });
-        expect(view.balance).toMatchObject({ owed: '0.00', overdue: '0.00', status: 'Paid up' });
       });
     }
   );
