@@ -15,13 +15,24 @@ import { Input } from "@/components/ui/input";
 import { DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import {
   Inspection,
   CompleteInspectionRequest,
   completeInspectionRequestSchema,
+  Turnover,
+  Apartment,
 } from "@/lib/validators";
 import { useCompleteInspection } from "@/api/inspections";
+import { useGetAllTurnovers } from "@/api/turnovers";
+import { useGetAllApartments } from "@/api/apartments";
 
 interface CompleteInspectionFormProps {
   inspection?: Inspection;
@@ -47,6 +58,8 @@ export const CompleteInspectionForm = ({
   });
 
   const completeInspectionMutation = useCompleteInspection();
+  const { data: turnovers } = useGetAllTurnovers();
+  const { data: apartments } = useGetAllApartments();
 
   const onSubmit = async (data: CompleteInspectionRequest) => {
     await completeInspectionMutation.mutateAsync(data);
@@ -74,10 +87,30 @@ export const CompleteInspectionForm = ({
           name="turnoverId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Turnover ID</FormLabel>
-              <FormControl>
-                <Input {...field} disabled />
-              </FormControl>
+              <FormLabel>Turnover</FormLabel>
+              <Select
+                onValueChange={(value) => {
+                  field.onChange(value);
+                  const turnover = turnovers?.find((t) => t.id === value);
+                  if (turnover) {
+                    form.setValue("apartmentId", turnover.apartmentId, { shouldValidate: true });
+                  }
+                }}
+                value={field.value}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a turnover" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {turnovers?.map((turnover: Turnover) => (
+                    <SelectItem key={turnover.id} value={turnover.id}>
+                      {turnover.id} ({turnover.apartmentId})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
@@ -87,10 +120,21 @@ export const CompleteInspectionForm = ({
           name="apartmentId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Apartment ID</FormLabel>
-              <FormControl>
-                <Input {...field} disabled />
-              </FormControl>
+              <FormLabel>Apartment</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select an apartment" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {apartments?.map((apartment: Apartment) => (
+                    <SelectItem key={apartment.id} value={apartment.id}>
+                      {apartment.unitNumber} ({apartment.id})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
