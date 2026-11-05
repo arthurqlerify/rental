@@ -4,16 +4,18 @@ import { DataTable } from "@/components/shared/DataTable";
 import { useGetAllInspections } from "@/api/inspections";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { Pencil, CheckSquare } from "lucide-react";
+import { Pencil, CheckSquare, ListChecks } from "lucide-react";
 
 interface InspectionListProps {
   onCompleteInspection: (inspection: Inspection) => void;
   onPassFinalInspection: (inspection: Inspection) => void;
+  onViewChecklist: (inspection: Inspection) => void;
 }
 
 const inspectionColumns = (
   onCompleteInspection: (inspection: Inspection) => void,
-  onPassFinalInspection: (inspection: Inspection) => void
+  onPassFinalInspection: (inspection: Inspection) => void,
+  onViewChecklist: (inspection: Inspection) => void
 ): any[] => [
   {
     accessorKey: "id",
@@ -73,17 +75,25 @@ const inspectionColumns = (
         >
           <CheckSquare className="mr-2 h-4 w-4" /> Pass Final
         </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onViewChecklist(row)}
+          disabled={!row.completedAt} // The checklist is ticked when the inspection is completed
+        >
+          <ListChecks className="mr-2 h-4 w-4" /> Checklist
+        </Button>
       </div>
     ),
   },
 ];
 
-export const InspectionList = ({ onCompleteInspection, onPassFinalInspection }: InspectionListProps) => {
+export const InspectionList = ({ onCompleteInspection, onPassFinalInspection, onViewChecklist }: InspectionListProps) => {
   const { data: inspections, isLoading, isError, error } = useGetAllInspections();
 
   const columns = React.useMemo(
-    () => inspectionColumns(onCompleteInspection, onPassFinalInspection),
-    [onCompleteInspection, onPassFinalInspection]
+    () => inspectionColumns(onCompleteInspection, onPassFinalInspection, onViewChecklist),
+    [onCompleteInspection, onPassFinalInspection, onViewChecklist]
   );
 
   return (
