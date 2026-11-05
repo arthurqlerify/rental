@@ -284,6 +284,7 @@ export const completeInspectionRequestSchema = inspectionSchema.pick({
   completedAt: true,
   findingsSummary: true,
   hasDamages: true,
+  checklist: true,
 }).extend({
   photosUrl: z.string().url("Photos URL must be a valid URL").optional(),
   nextActorEmail: z.string().email("Invalid email format").optional(),

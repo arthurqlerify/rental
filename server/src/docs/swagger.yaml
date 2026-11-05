@@ -952,8 +952,8 @@ components:
           example: https://docs.io/c9001
         checklist:
           type: string
-          description: The checklist of the Inspection.
-          example: Standard move-out list
+          description: 'The move-out checklist items ticked when the Inspection was completed, one "Room: item" per line.'
+          example: "Entrance: Doorbell and intercom work\nKitchen: Sink and tap free of leaks"
       required:
         - id
         - turnoverId
@@ -1407,6 +1407,10 @@ components:
         nextActorEmail:
           type: string
           example: tenant@ex.com
+        checklist:
+          type: string
+          description: 'The ticked move-out checklist items, one "Room: item" per line.'
+          example: "Entrance: Doorbell and intercom work\nKitchen: Sink and tap free of leaks"
       required:
         - id
         - turnoverId

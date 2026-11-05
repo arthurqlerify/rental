@@ -35,6 +35,9 @@ import { useCompleteInspection } from "@/api/inspections";
 import { useGetAllTurnovers } from "@/api/turnovers";
 import { useGetAllApartments } from "@/api/apartments";
 
+import { MoveOutChecklist } from "./MoveOutChecklist";
+import { formatChecklist, parseChecklist } from "./moveOutChecklistItems";
+
 interface CompleteInspectionFormProps {
   inspection?: Inspection;
   onSuccess: () => void;
@@ -55,6 +58,7 @@ export const CompleteInspectionForm = ({
       hasDamages: inspection?.hasDamages || "false",
       photosUrl: inspection?.photosUrl || "",
       nextActorEmail: inspection?.nextActorEmail || "",
+      checklist: inspection?.checklist || "",
     },
   });
 
@@ -164,6 +168,20 @@ export const CompleteInspectionForm = ({
               <FormControl>
                 <Textarea {...field} />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="checklist"
+          render={({ field }) => (
+            <FormItem>
+              <p className="text-sm font-medium">Move-out Checklist</p>
+              <MoveOutChecklist
+                ticked={parseChecklist(field.value)}
+                onTickedChange={(ticked) => field.onChange(formatChecklist(ticked))}
+              />
               <FormMessage />
             </FormItem>
           )}

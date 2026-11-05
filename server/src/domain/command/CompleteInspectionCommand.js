@@ -2,7 +2,7 @@ import Inspection from '../entity/Inspection.js';
 import db from '../../infrastructure/db/index.js';
 
 class CompleteInspectionCommand {
-  static async execute({ id, turnoverId, apartmentId, completedAt, findingsSummary, hasDamages, photosUrl, nextActorEmail }) {
+  static async execute({ id, turnoverId, apartmentId, completedAt, findingsSummary, hasDamages, photosUrl, nextActorEmail, checklist }) {
     // Given an inspection appointment exists for the turnover
     const existingInspection = await db.findById('Inspection', id);
     if (!existingInspection) {
@@ -19,6 +19,8 @@ class CompleteInspectionCommand {
       hasDamages,
       photosUrl,
       nextActorEmail,
+      // The ticked move-out checklist items, one "Room: item" per line
+      checklist,
     };
 
     // The `db.update` method will merge these updates with the existing inspection data.
