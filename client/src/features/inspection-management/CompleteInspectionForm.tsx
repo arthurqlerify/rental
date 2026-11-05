@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -121,10 +122,11 @@ export const CompleteInspectionForm = ({
           render={({ field }) => (
             <FormItem>
               <FormLabel>Apartment</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
+              {/* As in the Schedule Inspection form, the apartment is the turnover's apartment, so it can't disagree with it */}
+              <Select value={field.value} disabled>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select an apartment" />
+                    <SelectValue placeholder="Select a turnover first" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -135,6 +137,7 @@ export const CompleteInspectionForm = ({
                   ))}
                 </SelectContent>
               </Select>
+              <FormDescription>Set from the turnover.</FormDescription>
               <FormMessage />
             </FormItem>
           )}

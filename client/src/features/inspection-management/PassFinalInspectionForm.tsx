@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -85,16 +86,8 @@ export const PassFinalInspectionForm = ({
           render={({ field }) => (
             <FormItem>
               <FormLabel>Turnover</FormLabel>
-              <Select
-                onValueChange={(value) => {
-                  field.onChange(value);
-                  const turnover = turnovers?.find((t) => t.id === value);
-                  if (turnover) {
-                    form.setValue("apartmentId", turnover.apartmentId, { shouldValidate: true });
-                  }
-                }}
-                value={field.value}
-              >
+              {/* Pass Final Inspection keeps the inspection's turnover and apartment (the server doesn't change them), so both are shown but locked */}
+              <Select value={field.value} disabled>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select a turnover" />
@@ -118,7 +111,7 @@ export const PassFinalInspectionForm = ({
           render={({ field }) => (
             <FormItem>
               <FormLabel>Apartment</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
+              <Select value={field.value} disabled>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select an apartment" />
@@ -132,6 +125,7 @@ export const PassFinalInspectionForm = ({
                   ))}
                 </SelectContent>
               </Select>
+              <FormDescription>The inspection's turnover and apartment stay as they are when it passes.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
