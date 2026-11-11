@@ -3,6 +3,7 @@ import { fileURLToPath } from 'url';
 import { loadFeature, defineFeature } from 'jest-cucumber';
 import request from 'supertest';
 import app from '../src/bootstrap/app.js';
+import { onDay } from './support/clock.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -75,15 +76,17 @@ defineFeature(feature, test => {
         expect(createTurnoverResponse.statusCode).toBe(200);
         turnoverId = createTurnoverResponse.body.id;
 
-        // Mark Lease Ended
-        const markLeaseEndedResponse = await request(app).post('/api/v1/mark-lease-ended').send({
-          id: leaseId,
-          apartmentId: apartmentId,
-          endDate: '2025-09-30',
-          moveOutConfirmedAt: '2025-09-30T10:00:00.000Z',
-          turnoverId: turnoverId,
-          nextActorEmail: 'ops@example.com'
-        });
+        // Mark Lease Ended, on the lease's end date
+        const markLeaseEndedResponse = await onDay('2025-09-30', () =>
+          request(app).post('/api/v1/mark-lease-ended').send({
+            id: leaseId,
+            apartmentId: apartmentId,
+            endDate: '2025-09-30',
+            moveOutConfirmedAt: '2025-09-30T10:00:00.000Z',
+            turnoverId: turnoverId,
+            nextActorEmail: 'ops@example.com'
+          })
+        );
         expect(markLeaseEndedResponse.statusCode).toBe(200);
 
         // Record Apartment Vacated

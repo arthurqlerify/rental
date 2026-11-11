@@ -1,6 +1,7 @@
 // Setup shared by the rent scenarios: a property, and a lease on a new vacant apartment in it.
 import request from 'supertest';
 import app from '../../src/bootstrap/app.js';
+import { onDay } from './clock.js';
 
 let propertyCount = 0;
 let unitCount = 0;
@@ -22,7 +23,7 @@ export async function createProperty() {
 
 // Creates an active lease. Create Lease needs a start and an end date, so a lease given neither
 // runs from 2025-01-01 to 2030-12-31, which covers every month these scenarios charge. With
-// ended: true, the lease is also marked ended on its end date.
+// ended: true, the lease is also marked ended on its end date, with today set to that date.
 export async function createLease({
   propertyId,
   tenantName,
@@ -57,15 +58,17 @@ export async function createLease({
   const lease = leaseResponse.body;
 
   if (ended) {
-    const endedResponse = await request(app)
-      .post('/api/v1/mark-lease-ended')
-      .send({
-        id: lease.id,
-        apartmentId: lease.apartmentId,
-        endDate,
-        moveOutConfirmedAt: `${endDate}T10:00`,
-        nextActorEmail: 'pm@rentco.com'
-      });
+    const endedResponse = await onDay(endDate, () =>
+      request(app)
+        .post('/api/v1/mark-lease-ended')
+        .send({
+          id: lease.id,
+          apartmentId: lease.apartmentId,
+          endDate,
+          moveOutConfirmedAt: `${endDate}T10:00`,
+          nextActorEmail: 'pm@rentco.com'
+        })
+    );
     expect(endedResponse.statusCode).toBe(200);
   }
 

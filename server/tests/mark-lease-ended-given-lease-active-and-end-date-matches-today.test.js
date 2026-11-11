@@ -3,6 +3,7 @@ import { fileURLToPath } from 'url';
 import { loadFeature, defineFeature } from 'jest-cucumber';
 import request from 'supertest';
 import app from '../src/bootstrap/app.js';
+import { onDay } from './support/clock.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -10,7 +11,7 @@ const __dirname = path.dirname(__filename);
 const feature = loadFeature(path.resolve(__dirname, 'mark-lease-ended-given-lease-active-and-end-date-matches-today.feature'));
 
 const CURRENT_DATE_FULL = '2025-09-15T16:49:44.353Z';
-const LEASE_END_DATE_SHORT = '2025-09-15'; // To match current date (today) for scenario
+const LEASE_END_DATE_SHORT = '2025-09-15'; // The lease's scheduled end date, which is also today when it is marked ended
 
 defineFeature(feature, test => {
   let propertyId;
@@ -111,16 +112,19 @@ defineFeature(feature, test => {
       });
 
       when('Automation marks the lease as ended', async () => {
-        markLeaseEndedResponse = await request(app)
-          .post('/api/v1/mark-lease-ended')
-          .send({
-            id: leaseId,
-            apartmentId: apartmentId,
-            endDate: LEASE_END_DATE_SHORT,
-            moveOutConfirmedAt: CURRENT_DATE_FULL, // Set to current date as per scenario
-            turnoverId: turnoverId,
-            nextActorEmail: 'ops@rentco.com'
-          });
+        // Today is the lease's scheduled end date
+        markLeaseEndedResponse = await onDay(LEASE_END_DATE_SHORT, () =>
+          request(app)
+            .post('/api/v1/mark-lease-ended')
+            .send({
+              id: leaseId,
+              apartmentId: apartmentId,
+              endDate: LEASE_END_DATE_SHORT,
+              moveOutConfirmedAt: CURRENT_DATE_FULL, // Set to current date as per scenario
+              turnoverId: turnoverId,
+              nextActorEmail: 'ops@rentco.com'
+            })
+        );
       });
 
       then('Lease Ended is recorded and the associated turnover moves to awaiting vacancy confirmation.', async () => {
