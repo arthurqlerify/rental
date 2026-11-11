@@ -11,7 +11,8 @@ class MarkLeaseEndedCommand {
 
     // 2. Validate GWT conditions
     // "Given today matches the scheduled lease end date"
-    // Today is the server's date (UTC), not a date sent in the request.
+    // Today is the server's date (UTC), not a date sent in the request. A later day is accepted too, so a
+    // lease whose end date the automation missed can still be ended; only a day before the end date is refused.
     const leaseScheduledEnd = lease.endDate ? new Date(lease.endDate) : undefined;
     if (!leaseScheduledEnd || Number.isNaN(leaseScheduledEnd.getTime())) {
       throw new Error('Lease cannot be marked ended: it has no scheduled end date.');
@@ -20,9 +21,9 @@ class MarkLeaseEndedCommand {
     const todayStr = new Date().toISOString().split('T')[0];
     const leaseScheduledEndDateStr = leaseScheduledEnd.toISOString().split('T')[0];
 
-    if (todayStr !== leaseScheduledEndDateStr) {
+    if (todayStr < leaseScheduledEndDateStr) {
       throw new Error(
-        `Lease cannot be marked ended: today (${todayStr}) is not its scheduled end date (${leaseScheduledEndDateStr}).`
+        `Lease cannot be marked ended: today (${todayStr}) comes before its scheduled end date (${leaseScheduledEndDateStr}).`
       );
     }
 

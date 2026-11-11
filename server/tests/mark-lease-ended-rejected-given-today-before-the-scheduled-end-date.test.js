@@ -90,7 +90,7 @@ defineFeature(feature, test => {
       then('no Lease Ended is recorded and the lease stays active.', async () => {
         expect(markLeaseEndedResponse.statusCode).toBe(400);
         expect(markLeaseEndedResponse.body.message).toBe(
-          `Lease cannot be marked ended: today (${TODAY}) is not its scheduled end date (${LEASE_END_DATE}).`
+          `Lease cannot be marked ended: today (${TODAY}) comes before its scheduled end date (${LEASE_END_DATE}).`
         );
 
         const getLeaseResponse = await request(app).get(`/api/v1/get-lease-by-id/${leaseId}`);

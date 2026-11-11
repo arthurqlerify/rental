@@ -79,7 +79,7 @@ paths:
   /mark-lease-ended:
     post:
       summary: Mark Lease Ended
-      description: Executes the "Mark Lease Ended" command. Records the move-out on the lease. Refused unless today (the server's date, in UTC) is the lease's scheduled end date; the endDate sent in the request does not decide this. Also refused when the lease has already been marked ended.
+      description: Executes the "Mark Lease Ended" command. Records the move-out on the lease. Accepted on the lease's scheduled end date or any later day, judged by today (the server's date, in UTC); the endDate sent in the request does not decide this. Refused before the scheduled end date, and when the lease has already been marked ended.
       operationId: markLeaseEnded
       tags:
         - RentalManagementService
