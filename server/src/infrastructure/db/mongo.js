@@ -34,12 +34,12 @@ const mongoAdapter = {
 
   update: async (collection, id, updates) => {
     const db = await getDb();
-    const res = await db.collection(collection).findOneAndUpdate(
+    // Driver v6 returns the updated document itself (or null), not { value }.
+    return await db.collection(collection).findOneAndUpdate(
       { id },
       { $set: updates },
       { returnDocument: 'after' }
     );
-    return res.value;
   },
 
   remove: async (collection, id) => {

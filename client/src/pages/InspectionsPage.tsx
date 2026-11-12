@@ -8,11 +8,14 @@ import { Inspection } from "@/lib/validators";
 import { ScheduleInspectionForm } from "@/features/inspection-management/ScheduleInspectionForm";
 import { CompleteInspectionForm } from "@/features/inspection-management/CompleteInspectionForm";
 import { PassFinalInspectionForm } from "@/features/inspection-management/PassFinalInspectionForm";
+import { MoveOutChecklist } from "@/features/inspection-management/MoveOutChecklist";
+import { parseChecklist } from "@/features/inspection-management/moveOutChecklistItems";
 
 const InspectionsPage = () => {
   const [isScheduleInspectionFormOpen, setIsScheduleInspectionFormOpen] = useState(false);
   const [isCompleteInspectionFormOpen, setIsCompleteInspectionFormOpen] = useState(false);
   const [isPassFinalInspectionFormOpen, setIsPassFinalInspectionFormOpen] = useState(false);
+  const [isChecklistOpen, setIsChecklistOpen] = useState(false);
   const [selectedInspection, setSelectedInspection] = useState<Inspection | undefined>(undefined);
 
   const handleScheduleInspection = () => {
@@ -28,6 +31,11 @@ const InspectionsPage = () => {
   const handlePassFinalInspection = (inspection: Inspection) => {
     setSelectedInspection(inspection);
     setIsPassFinalInspectionFormOpen(true);
+  };
+
+  const handleViewChecklist = (inspection: Inspection) => {
+    setSelectedInspection(inspection);
+    setIsChecklistOpen(true);
   };
 
   const handleFormSuccess = () => {
@@ -61,10 +69,12 @@ const InspectionsPage = () => {
       <InspectionList
         onCompleteInspection={handleCompleteInspection}
         onPassFinalInspection={handlePassFinalInspection}
+        onViewChecklist={handleViewChecklist}
       />
 
       <Dialog open={isCompleteInspectionFormOpen} onOpenChange={setIsCompleteInspectionFormOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        {/* The move-out checklist makes the form taller than most screens, so the dialog scrolls */}
+        <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Complete Inspection</DialogTitle>
             <DialogDescription>
@@ -84,6 +94,18 @@ const InspectionsPage = () => {
             </DialogDescription>
           </DialogHeader>
           <PassFinalInspectionForm inspection={selectedInspection} onSuccess={handleFormSuccess} />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isChecklistOpen} onOpenChange={setIsChecklistOpen}>
+        <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Move-out Checklist</DialogTitle>
+            <DialogDescription>
+              The checks ticked when the inspection was completed.
+            </DialogDescription>
+          </DialogHeader>
+          <MoveOutChecklist ticked={parseChecklist(selectedInspection?.checklist)} disabled />
         </DialogContent>
       </Dialog>
     </div>

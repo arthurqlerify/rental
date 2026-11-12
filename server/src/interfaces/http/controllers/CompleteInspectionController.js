@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.post('/', async (req, res) => {
   try {
-    const { id, turnoverId, apartmentId, completedAt, findingsSummary, hasDamages, photosUrl, nextActorEmail } = req.body;
+    const { id, turnoverId, apartmentId, completedAt, findingsSummary, hasDamages, photosUrl, nextActorEmail, checklist } = req.body;
     const result = await CompleteInspectionCommand.execute({
       id,
       turnoverId,
@@ -15,6 +15,7 @@ router.post('/', async (req, res) => {
       hasDamages,
       photosUrl,
       nextActorEmail,
+      checklist,
     });
     res.status(200).json(result);
   } catch (err) {

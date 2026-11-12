@@ -1,6 +1,6 @@
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { DollarSign, Home, Key, Wrench, FileText, CalendarCheck } from "lucide-react";
+import { DollarSign, Home, Key, Wrench, FileText, CalendarCheck, Wallet, AlertTriangle, FileWarning } from "lucide-react";
 import { useGetAllLeases } from "@/api/leases";
 import { useGetAllTurnovers } from "@/api/turnovers";
 import { useGetAllInspections } from "@/api/inspections";
@@ -8,6 +8,8 @@ import { useGetAllRenovationCases } from "@/api/renovationCases";
 import { useGetAllWorkOrders } from "@/api/workOrders";
 import { useGetAllApartments } from "@/api/apartments";
 import { useGetAllProperties } from "@/api/properties";
+import { useGetRentSummary } from "@/api/rent";
+import { formatMoney } from "@/features/rent-management/formatRent";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -20,6 +22,7 @@ const Dashboard = () => {
   const { data: workOrders, isLoading: isLoadingWorkOrders } = useGetAllWorkOrders();
   const { data: apartments, isLoading: isLoadingApartments } = useGetAllApartments();
   const { data: properties, isLoading: isLoadingProperties } = useGetAllProperties();
+  const { data: rentSummary, isLoading: isLoadingRentSummary } = useGetRentSummary();
 
   const totalLeases = leases?.length || 0;
   const activeTurnovers = turnovers?.filter(t => !t.readyToRentDate).length || 0;
@@ -47,6 +50,24 @@ const Dashboard = () => {
       value: isLoadingLeases ? <Skeleton className="h-6 w-16" /> : totalLeases,
       icon: <FileText className="h-4 w-4 text-muted-foreground" />,
       link: "/leases"
+    },
+    {
+      title: "Outstanding Rent",
+      value: isLoadingRentSummary ? <Skeleton className="h-6 w-16" /> : formatMoney(rentSummary?.totalOutstanding),
+      icon: <Wallet className="h-4 w-4 text-muted-foreground" />,
+      link: "/rent"
+    },
+    {
+      title: "Overdue Rent",
+      value: isLoadingRentSummary ? <Skeleton className="h-6 w-16" /> : formatMoney(rentSummary?.totalOverdue),
+      icon: <AlertTriangle className="h-4 w-4 text-muted-foreground" />,
+      link: "/rent"
+    },
+    {
+      title: "Overdue Leases",
+      value: isLoadingRentSummary ? <Skeleton className="h-6 w-16" /> : rentSummary?.overdueLeasesCount ?? "N/A",
+      icon: <FileWarning className="h-4 w-4 text-muted-foreground" />,
+      link: "/rent"
     },
     {
       title: "Active Turnovers",

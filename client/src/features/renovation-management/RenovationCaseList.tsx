@@ -4,20 +4,22 @@ import { DataTable } from "@/components/shared/DataTable";
 import { useGetAllRenovationCases } from "@/api/renovationCases";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { Pencil, FilePlus, DollarSign, CheckSquare } from "lucide-react";
+import { Pencil, FilePlus, DollarSign, CheckSquare, Columns } from "lucide-react";
 
 interface RenovationCaseListProps {
   onCreateRenovationReport: (caseItem: RenovationCase) => void;
   onRequestRenovationEstimate: (caseItem: RenovationCase) => void;
   onProvideRenovationEstimate: (caseItem: RenovationCase) => void;
   onSelectRenovationPlan: (caseItem: RenovationCase) => void;
+  onCompareOptions: (caseItem: RenovationCase) => void;
 }
 
 const renovationCaseColumns = (
   onCreateRenovationReport: (caseItem: RenovationCase) => void,
   onRequestRenovationEstimate: (caseItem: RenovationCase) => void,
   onProvideRenovationEstimate: (caseItem: RenovationCase) => void,
-  onSelectRenovationPlan: (caseItem: RenovationCase) => void
+  onSelectRenovationPlan: (caseItem: RenovationCase) => void,
+  onCompareOptions: (caseItem: RenovationCase) => void
 ): any[] => [
   {
     accessorKey: "id",
@@ -84,6 +86,16 @@ const renovationCaseColumns = (
         >
           <CheckSquare className="mr-2 h-4 w-4" /> Select Plan
         </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onCompareOptions(row)}
+          disabled={
+            ![row.costGood, row.costBetter, row.costPremium, row.leadDaysGood, row.leadDaysBetter, row.leadDaysPremium].some(Boolean)
+          } // Can compare once any cost or lead time is provided
+        >
+          <Columns className="mr-2 h-4 w-4" /> Compare Options
+        </Button>
       </div>
     ),
   },
@@ -94,6 +106,7 @@ export const RenovationCaseList = ({
   onRequestRenovationEstimate,
   onProvideRenovationEstimate,
   onSelectRenovationPlan,
+  onCompareOptions,
 }: RenovationCaseListProps) => {
   const { data: renovationCases, isLoading, isError, error } = useGetAllRenovationCases();
 
@@ -103,9 +116,10 @@ export const RenovationCaseList = ({
         onCreateRenovationReport,
         onRequestRenovationEstimate,
         onProvideRenovationEstimate,
-        onSelectRenovationPlan
+        onSelectRenovationPlan,
+        onCompareOptions
       ),
-    [onCreateRenovationReport, onRequestRenovationEstimate, onProvideRenovationEstimate, onSelectRenovationPlan]
+    [onCreateRenovationReport, onRequestRenovationEstimate, onProvideRenovationEstimate, onSelectRenovationPlan, onCompareOptions]
   );
 
   return (
