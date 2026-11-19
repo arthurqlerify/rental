@@ -145,7 +145,7 @@ paths:
   /create-renovation-report:
     post:
       summary: Create Renovation Report
-      description: Executes the "Create Renovation Report" command. ...
+      description: Executes the "Create Renovation Report" command. Records a damage report for a completed inspection that found damage. Refused when no inspection exists with the given inspectionId, when the inspection is not completed (it has no completedAt), and when it found no damage (hasDamages is not true).
       operationId: createRenovationReport
       tags:
         - RentalManagementService
