@@ -90,7 +90,8 @@ export const ScheduleInspectionForm = ({ onSuccess, turnoverId }: ScheduleInspec
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {turnovers?.map((turnover: Turnover) => (
+                  {/* A completed turnover (one with a ready-to-rent date) can't get an inspection, so it isn't offered */}
+                  {turnovers?.filter((turnover: Turnover) => !turnover.readyToRentDate || turnover.id === field.value).map((turnover: Turnover) => (
                     <SelectItem key={turnover.id} value={turnover.id}>
                       {turnover.id} ({turnover.apartmentId})
                     </SelectItem>

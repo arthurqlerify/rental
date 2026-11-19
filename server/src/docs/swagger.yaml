@@ -57,7 +57,7 @@ paths:
   /schedule-inspection:
     post:
       summary: Schedule Inspection
-      description: Executes the "Schedule Inspection" command. ...
+      description: Executes the "Schedule Inspection" command. Records an inspection appointment for an active turnover. Refused when no turnover exists with the given turnoverId, and when the turnover is already completed (it has a readyToRentDate).
       operationId: scheduleInspection
       tags:
         - RentalManagementService
