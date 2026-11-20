@@ -48,7 +48,16 @@ const inspectionColumns = (
   {
     accessorKey: "scheduledAt",
     header: "Scheduled At",
-    cell: (row: Inspection) => format(new Date(row.scheduledAt), "PPp"),
+    cell: (row: Inspection) => (
+      <div className="space-y-1">
+        <div>{format(new Date(row.scheduledAt), "PPp")}</div>
+        {row.previousScheduledAt && (
+          <div className="text-xs text-muted-foreground">
+            Moved from {format(new Date(row.previousScheduledAt), "PPp")}
+          </div>
+        )}
+      </div>
+    ),
   },
   {
     accessorKey: "assignedToEmail",

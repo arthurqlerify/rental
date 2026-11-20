@@ -21,6 +21,8 @@ class RescheduleInspectionCommand {
     // Only what is given changes: a new time, a new inspector, or both.
     const updates = {};
     if (scheduledAt) updates.scheduledAt = scheduledAt;
+    // A move keeps the time the inspection had until now, so the list can show where it was moved from.
+    if (scheduledAt && scheduledAt !== inspection.scheduledAt) updates.previousScheduledAt = inspection.scheduledAt;
     if (assignedToEmail) updates.assignedToEmail = assignedToEmail;
 
     if (Object.keys(updates).length === 0) {

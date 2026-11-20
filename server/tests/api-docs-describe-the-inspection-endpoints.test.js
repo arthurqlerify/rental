@@ -77,6 +77,9 @@ defineFeature(feature, test => {
         const reschedule = resolve(docs, docs.paths['/reschedule-inspection'].post.requestBody.content['application/json'].schema.$ref);
         expect(Object.keys(reschedule.properties).sort()).toEqual(['assignedToEmail', 'id', 'scheduledAt']);
         expect(reschedule.required).toEqual(['id']);
+        // A moved inspection keeps the time it was moved from.
+        expect(docs.components.schemas.Inspection.properties.previousScheduledAt).toBeDefined();
+        expect(docs.paths['/reschedule-inspection'].post.description).toMatch(/previousScheduledAt/);
 
         // Cancel needs a reason, and a cancelled inspection carries when and why it was cancelled.
         const cancel = resolve(docs, docs.paths['/cancel-inspection'].post.requestBody.content['application/json'].schema.$ref);

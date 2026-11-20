@@ -47,6 +47,7 @@ export const inspectionSchema = z.object({
   turnoverId: z.string().min(1, "Turnover ID is required"),
   apartmentId: z.string().min(1, "Apartment ID is required"),
   scheduledAt: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/, "This field must be a valid datetime"),
+  previousScheduledAt: z.string().optional(), // The time the inspection had before it was last moved
   assignedToEmail: z.string().email("Invalid email format").optional(),
   inspectorName: z.string().min(1, "Inspector name is required"),
   locationNotes: z.string().optional(),

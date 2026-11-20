@@ -6,6 +6,7 @@ class Inspection {
     turnoverId,
     apartmentId,
     scheduledAt,
+    previousScheduledAt,
     assignedToEmail,
     inspectorName,
     locationNotes,
@@ -28,6 +29,7 @@ class Inspection {
     this.turnoverId = turnoverId;
     this.apartmentId = apartmentId;
     this.scheduledAt = scheduledAt;
+    this.previousScheduledAt = previousScheduledAt;
     this.assignedToEmail = assignedToEmail;
     this.inspectorName = inspectorName;
     this.locationNotes = locationNotes;
@@ -49,6 +51,7 @@ class Inspection {
       turnoverId: this.turnoverId,
       apartmentId: this.apartmentId,
       scheduledAt: this.scheduledAt,
+      previousScheduledAt: this.previousScheduledAt,
       assignedToEmail: this.assignedToEmail,
       inspectorName: this.inspectorName,
       locationNotes: this.locationNotes,

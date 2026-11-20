@@ -38,6 +38,8 @@ defineFeature(feature, test => {
         const stored = await getInspection(inspection.id);
         expect(stored.assignedToEmail).toBe('inspector2@rentco.com');
         expect(stored.scheduledAt).toBe('2025-09-28T09:00');
+        // The time did not change, so the inspection was not moved from anywhere.
+        expect(stored.previousScheduledAt).toBeUndefined();
       });
     }
   );
