@@ -15,6 +15,16 @@ class ScheduleInspectionCommand {
       throw new Error(`Turnover with ID ${turnoverId} is already completed.`);
     }
 
+    // A turnover has at most one open inspection: one that is neither completed nor cancelled.
+    const openInspection = (await db.findAll('Inspection')).find(
+      (i) => i.turnoverId === turnoverId && !i.completedAt && !i.cancelledAt
+    );
+    if (openInspection) {
+      throw new Error(
+        `Turnover with ID ${turnoverId} already has an open inspection (${openInspection.id}). Reschedule or cancel it instead.`
+      );
+    }
+
     // GWT: "Then Inspection Scheduled is recorded with the appointment details."
     const inspection = new Inspection({
       id: uuid(),

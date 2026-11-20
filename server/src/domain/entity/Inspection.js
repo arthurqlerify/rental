@@ -16,7 +16,9 @@ class Inspection {
     photosUrl,
     passedAt,
     certificateUrl,
-    checklist
+    checklist,
+    cancelledAt,
+    cancellationReason
   }) {
     if (!id) {
       throw new Error('Inspection ID is required.');
@@ -37,6 +39,8 @@ class Inspection {
     this.passedAt = passedAt;
     this.certificateUrl = certificateUrl;
     this.checklist = checklist;
+    this.cancelledAt = cancelledAt;
+    this.cancellationReason = cancellationReason;
   }
 
   toJSON() {
@@ -55,7 +59,9 @@ class Inspection {
       photosUrl: this.photosUrl,
       passedAt: this.passedAt,
       certificateUrl: this.certificateUrl,
-      checklist: this.checklist
+      checklist: this.checklist,
+      cancelledAt: this.cancelledAt,
+      cancellationReason: this.cancellationReason
     };
   }
 }

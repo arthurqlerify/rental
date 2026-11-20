@@ -8,6 +8,8 @@ import { Inspection } from "@/lib/validators";
 import { ScheduleInspectionForm } from "@/features/inspection-management/ScheduleInspectionForm";
 import { CompleteInspectionForm } from "@/features/inspection-management/CompleteInspectionForm";
 import { PassFinalInspectionForm } from "@/features/inspection-management/PassFinalInspectionForm";
+import { RescheduleInspectionForm } from "@/features/inspection-management/RescheduleInspectionForm";
+import { CancelInspectionForm } from "@/features/inspection-management/CancelInspectionForm";
 import { MoveOutChecklist } from "@/features/inspection-management/MoveOutChecklist";
 import { parseChecklist } from "@/features/inspection-management/moveOutChecklistItems";
 
@@ -16,6 +18,8 @@ const InspectionsPage = () => {
   const [isCompleteInspectionFormOpen, setIsCompleteInspectionFormOpen] = useState(false);
   const [isPassFinalInspectionFormOpen, setIsPassFinalInspectionFormOpen] = useState(false);
   const [isChecklistOpen, setIsChecklistOpen] = useState(false);
+  const [isRescheduleInspectionFormOpen, setIsRescheduleInspectionFormOpen] = useState(false);
+  const [isCancelInspectionFormOpen, setIsCancelInspectionFormOpen] = useState(false);
   const [selectedInspection, setSelectedInspection] = useState<Inspection | undefined>(undefined);
 
   const handleScheduleInspection = () => {
@@ -38,10 +42,22 @@ const InspectionsPage = () => {
     setIsChecklistOpen(true);
   };
 
+  const handleRescheduleInspection = (inspection: Inspection) => {
+    setSelectedInspection(inspection);
+    setIsRescheduleInspectionFormOpen(true);
+  };
+
+  const handleCancelInspection = (inspection: Inspection) => {
+    setSelectedInspection(inspection);
+    setIsCancelInspectionFormOpen(true);
+  };
+
   const handleFormSuccess = () => {
     setIsScheduleInspectionFormOpen(false);
     setIsCompleteInspectionFormOpen(false);
     setIsPassFinalInspectionFormOpen(false);
+    setIsRescheduleInspectionFormOpen(false);
+    setIsCancelInspectionFormOpen(false);
     setSelectedInspection(undefined);
   };
 
@@ -70,7 +86,33 @@ const InspectionsPage = () => {
         onCompleteInspection={handleCompleteInspection}
         onPassFinalInspection={handlePassFinalInspection}
         onViewChecklist={handleViewChecklist}
+        onRescheduleInspection={handleRescheduleInspection}
+        onCancelInspection={handleCancelInspection}
       />
+
+      <Dialog open={isRescheduleInspectionFormOpen} onOpenChange={setIsRescheduleInspectionFormOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Reschedule Inspection</DialogTitle>
+            <DialogDescription>
+              Move the inspection to another time or give it to another inspector.
+            </DialogDescription>
+          </DialogHeader>
+          <RescheduleInspectionForm inspection={selectedInspection} onSuccess={handleFormSuccess} />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isCancelInspectionFormOpen} onOpenChange={setIsCancelInspectionFormOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Cancel Inspection</DialogTitle>
+            <DialogDescription>
+              Say why the inspection will not take place.
+            </DialogDescription>
+          </DialogHeader>
+          <CancelInspectionForm inspection={selectedInspection} onSuccess={handleFormSuccess} />
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={isCompleteInspectionFormOpen} onOpenChange={setIsCompleteInspectionFormOpen}>
         {/* The move-out checklist makes the form taller than most screens, so the dialog scrolls */}
