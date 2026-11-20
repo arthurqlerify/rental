@@ -80,6 +80,10 @@ defineFeature(feature, test => {
         // A moved inspection keeps the time it was moved from.
         expect(docs.components.schemas.Inspection.properties.previousScheduledAt).toBeDefined();
         expect(docs.paths['/reschedule-inspection'].post.description).toMatch(/previousScheduledAt/);
+        // The list shows how many times an inspection was moved, and it can be moved at most 3 times.
+        expect(docs.components.schemas.Inspection.properties.moveCount.type).toBe('integer');
+        expect(docs.paths['/reschedule-inspection'].post.description).toMatch(/moveCount/);
+        expect(docs.paths['/reschedule-inspection'].post.description).toMatch(/moved at most 3 times/);
 
         // Cancel needs a reason, and a cancelled inspection carries when and why it was cancelled.
         const cancel = resolve(docs, docs.paths['/cancel-inspection'].post.requestBody.content['application/json'].schema.$ref);

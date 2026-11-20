@@ -48,6 +48,7 @@ export const inspectionSchema = z.object({
   apartmentId: z.string().min(1, "Apartment ID is required"),
   scheduledAt: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/, "This field must be a valid datetime"),
   previousScheduledAt: z.string().optional(), // The time the inspection had before it was last moved
+  moveCount: z.number().optional(), // How many times it was moved to another time; not set while never moved
   assignedToEmail: z.string().email("Invalid email format").optional(),
   inspectorName: z.string().min(1, "Inspector name is required"),
   locationNotes: z.string().optional(),
@@ -257,6 +258,9 @@ export const scheduleInspectionRequestSchema = inspectionSchema.pick({
   nextActorEmail: z.string().email("Invalid email format").optional(),
 });
 export type ScheduleInspectionRequest = z.infer<typeof scheduleInspectionRequestSchema>;
+
+// An inspection can be moved to another time at most this many times; the server refuses a further move.
+export const MAX_INSPECTION_MOVES = 3;
 
 // Moves an inspection to another time, gives it to another inspector, or both.
 export const rescheduleInspectionRequestSchema = inspectionSchema.pick({

@@ -1,5 +1,5 @@
 import React from "react";
-import { Inspection } from "@/lib/validators";
+import { Inspection, MAX_INSPECTION_MOVES } from "@/lib/validators";
 import { DataTable } from "@/components/shared/DataTable";
 import { useGetAllInspections } from "@/api/inspections";
 import { format } from "date-fns";
@@ -55,6 +55,18 @@ const inspectionColumns = (
           <div className="text-xs text-muted-foreground">
             Moved from {format(new Date(row.previousScheduledAt), "PPp")}
           </div>
+        )}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "moveCount",
+    header: "Times Moved",
+    cell: (row: Inspection) => (
+      <div className="space-y-1">
+        <div>{row.moveCount ?? 0}</div>
+        {(row.moveCount ?? 0) >= MAX_INSPECTION_MOVES && (
+          <div className="text-xs text-muted-foreground">No moves left</div>
         )}
       </div>
     ),

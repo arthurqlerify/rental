@@ -82,6 +82,14 @@ export async function completeInspection(inspection) {
   return response.body;
 }
 
+// Moves an inspection to another time through Reschedule Inspection.
+export async function moveInspection(id, scheduledAt) {
+  const response = await request(app).post('/api/v1/reschedule-inspection').send({ id, scheduledAt });
+  expect(response.statusCode).toBe(200);
+  expect(response.body.scheduledAt).toBe(scheduledAt);
+  return response.body;
+}
+
 export async function getInspection(id) {
   const response = await request(app).get(`/api/v1/get-inspection-by-id/${id}`);
   expect(response.statusCode).toBe(200);

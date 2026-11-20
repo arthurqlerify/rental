@@ -79,7 +79,7 @@ paths:
   /reschedule-inspection:
     post:
       summary: Reschedule Inspection
-      description: Executes the "Reschedule Inspection" command. Moves an inspection to another time (scheduledAt), gives it to another inspector (assignedToEmail), or both; a field left out keeps its value. When the time changes, the time the inspection had until then is kept in previousScheduledAt. Refused when no inspection exists with the given id, when neither scheduledAt nor assignedToEmail is given, when the inspection is already completed (it has a completedAt), and when it is cancelled (it has a cancelledAt).
+      description: Executes the "Reschedule Inspection" command. Moves an inspection to another time (scheduledAt), gives it to another inspector (assignedToEmail), or both; a field left out keeps its value. When the time changes, the inspection is moved: the time it had until then is kept in previousScheduledAt and moveCount goes up by one. An inspection can be moved at most 3 times; giving it to another inspector, or sending its current time again, is not a move. Refused when no inspection exists with the given id, when neither scheduledAt nor assignedToEmail is given, when the inspection is already completed (it has a completedAt), when it is cancelled (it has a cancelledAt), and when the time changes on an inspection already moved 3 times (moveCount 3).
       operationId: rescheduleInspection
       tags:
         - RentalManagementService
@@ -958,6 +958,10 @@ components:
           type: string
           description: The time the Inspection was scheduled for before it was last moved by Reschedule Inspection, shown in the list as "moved from". Not set while the Inspection has never been moved to another time.
           example: 2025-09-27T09:00
+        moveCount:
+          type: integer
+          description: How many times Reschedule Inspection has moved the Inspection to another time, shown in the list. At most 3. Not set while the Inspection has never been moved to another time.
+          example: 1
         assignedToEmail:
           type: string
           description: The assignedToEmail of the Inspection.

@@ -16,6 +16,7 @@ import { DialogFooter } from "@/components/ui/dialog";
 
 import {
   Inspection,
+  MAX_INSPECTION_MOVES,
   RescheduleInspectionRequest,
   rescheduleInspectionRequestSchema,
 } from "@/lib/validators";
@@ -41,9 +42,14 @@ export const RescheduleInspectionForm = ({ inspection, onSuccess }: RescheduleIn
 
   const rescheduleInspectionMutation = useRescheduleInspection();
 
+  // After its last allowed move the inspection keeps its time, and only the inspector can change.
+  const noMovesLeft = (inspection?.moveCount ?? 0) >= MAX_INSPECTION_MOVES;
+
   // A refusal is shown as a toast by the hook, and the dialog stays open.
   const onSubmit = (data: RescheduleInspectionRequest) => {
-    rescheduleInspectionMutation.mutate(data, { onSuccess: () => onSuccess() });
+    // Send the stored time unchanged, so the server does not count it as another move.
+    const request = noMovesLeft && inspection ? { ...data, scheduledAt: inspection.scheduledAt } : data;
+    rescheduleInspectionMutation.mutate(request, { onSuccess: () => onSuccess() });
   };
 
   return (
@@ -55,7 +61,11 @@ export const RescheduleInspectionForm = ({ inspection, onSuccess }: RescheduleIn
               Turnover {inspection.turnoverId}
               {inspection.apartmentId && `, apartment ${inspection.apartmentId}`}
             </div>
-            <div className="text-muted-foreground">Change the time, the inspector or both.</div>
+            <div className="text-muted-foreground">
+              {noMovesLeft
+                ? `Moved ${MAX_INSPECTION_MOVES} times already, so it cannot be moved again. You can still change the inspector.`
+                : `Change the time, the inspector or both. Moved ${inspection.moveCount ?? 0} of ${MAX_INSPECTION_MOVES} times.`}
+            </div>
           </div>
         )}
         <FormField
@@ -69,6 +79,7 @@ export const RescheduleInspectionForm = ({ inspection, onSuccess }: RescheduleIn
                   type="datetime-local"
                   value={toDateTimeInput(field.value)}
                   onChange={e => field.onChange(e.target.value)}
+                  disabled={noMovesLeft}
                 />
               </FormControl>
               <FormMessage />

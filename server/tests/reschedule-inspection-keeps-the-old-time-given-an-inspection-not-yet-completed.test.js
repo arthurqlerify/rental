@@ -25,6 +25,7 @@ defineFeature(feature, test => {
         expect(inspection.completedAt).toBeUndefined();
         // A newly scheduled inspection has not been moved from anywhere.
         expect(inspection.previousScheduledAt).toBeUndefined();
+        expect(inspection.moveCount).toBeUndefined();
       });
 
       when('the PropertyMgr moves it to another time', async () => {
@@ -38,16 +39,20 @@ defineFeature(feature, test => {
         expect(response.statusCode).toBe(200);
         expect(response.body.scheduledAt).toBe('2025-09-29T14:00');
         expect(response.body.previousScheduledAt).toBe('2025-09-28T09:00');
+        // The list shows how many times it was moved.
+        expect(response.body.moveCount).toBe(1);
 
         const stored = await getInspection(inspection.id);
         expect(stored.scheduledAt).toBe('2025-09-29T14:00');
         expect(stored.previousScheduledAt).toBe('2025-09-28T09:00');
+        expect(stored.moveCount).toBe(1);
 
         // Get All Inspections, which the inspection list reads, carries the old time too.
         const inspections = await getTurnoverInspections(turnoverId);
         expect(inspections).toHaveLength(1);
         expect(inspections[0].scheduledAt).toBe('2025-09-29T14:00');
         expect(inspections[0].previousScheduledAt).toBe('2025-09-28T09:00');
+        expect(inspections[0].moveCount).toBe(1);
       });
     }
   );

@@ -29,6 +29,7 @@ defineFeature(feature, test => {
         });
         expect(firstMove.statusCode).toBe(200);
         expect(firstMove.body.previousScheduledAt).toBe('2025-09-28T09:00');
+        expect(firstMove.body.moveCount).toBe(1);
       });
 
       when('the PropertyMgr moves it again', async () => {
@@ -42,11 +43,14 @@ defineFeature(feature, test => {
         expect(response.statusCode).toBe(200);
         expect(response.body.scheduledAt).toBe('2025-09-30T08:30');
         expect(response.body.previousScheduledAt).toBe('2025-09-29T14:00');
+        // Each move is counted.
+        expect(response.body.moveCount).toBe(2);
 
         const inspections = await getTurnoverInspections(turnoverId);
         expect(inspections).toHaveLength(1);
         expect(inspections[0].scheduledAt).toBe('2025-09-30T08:30');
         expect(inspections[0].previousScheduledAt).toBe('2025-09-29T14:00');
+        expect(inspections[0].moveCount).toBe(2);
       });
     }
   );
