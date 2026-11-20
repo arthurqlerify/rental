@@ -1,6 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-import { Inspection, ScheduleInspectionRequest, CompleteInspectionRequest, PassFinalInspectionRequest } from "@/lib/validators";
+import {
+  Inspection,
+  ScheduleInspectionRequest,
+  RescheduleInspectionRequest,
+  CancelInspectionRequest,
+  CompleteInspectionRequest,
+  PassFinalInspectionRequest,
+} from "@/lib/validators";
 import { useToast } from "@/hooks/use-toast";
 
 export const useGetAllInspections = () => {
@@ -35,6 +42,52 @@ export const useScheduleInspection = () => {
       toast({
         title: "Error",
         description: error.message || "Failed to schedule inspection.",
+        variant: "destructive",
+      });
+    },
+  });
+};
+
+export const useRescheduleInspection = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  return useMutation({
+    mutationFn: (data: RescheduleInspectionRequest) => api.post("/reschedule-inspection", data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["inspections"] });
+      toast({
+        title: "Success!",
+        description: "Inspection rescheduled successfully.",
+        variant: "default",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to reschedule inspection.",
+        variant: "destructive",
+      });
+    },
+  });
+};
+
+export const useCancelInspection = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  return useMutation({
+    mutationFn: (data: CancelInspectionRequest) => api.post("/cancel-inspection", data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["inspections"] });
+      toast({
+        title: "Success!",
+        description: "Inspection cancelled.",
+        variant: "default",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to cancel inspection.",
         variant: "destructive",
       });
     },

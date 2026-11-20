@@ -47,6 +47,8 @@ export const inspectionSchema = z.object({
   turnoverId: z.string().min(1, "Turnover ID is required"),
   apartmentId: z.string().min(1, "Apartment ID is required"),
   scheduledAt: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/, "This field must be a valid datetime"),
+  previousScheduledAt: z.string().optional(), // The time the inspection had before it was last moved
+  moveCount: z.number().optional(), // How many times it was moved to another time; not set while never moved
   assignedToEmail: z.string().email("Invalid email format").optional(),
   inspectorName: z.string().min(1, "Inspector name is required"),
   locationNotes: z.string().optional(),
@@ -58,6 +60,8 @@ export const inspectionSchema = z.object({
   passedAt: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/, "This field must be a valid datetime").optional(), // Mark optional due to spec ambiguity
   certificateUrl: z.string().url("Certificate URL must be a valid URL").optional(),
   checklist: z.string().optional(),
+  cancelledAt: z.string().optional(), // Set when the inspection is cancelled
+  cancellationReason: z.string().optional(),
 });
 export type Inspection = z.infer<typeof inspectionSchema>;
 
@@ -254,6 +258,25 @@ export const scheduleInspectionRequestSchema = inspectionSchema.pick({
   nextActorEmail: z.string().email("Invalid email format").optional(),
 });
 export type ScheduleInspectionRequest = z.infer<typeof scheduleInspectionRequestSchema>;
+
+// An inspection can be moved to another time at most this many times; the server refuses a further move.
+export const MAX_INSPECTION_MOVES = 3;
+
+// Moves an inspection to another time, gives it to another inspector, or both.
+export const rescheduleInspectionRequestSchema = inspectionSchema.pick({
+  id: true,
+  scheduledAt: true,
+}).extend({
+  // Left empty, the inspection keeps its inspector
+  assignedToEmail: z.string().email("Invalid email format").or(z.literal("")),
+});
+export type RescheduleInspectionRequest = z.infer<typeof rescheduleInspectionRequestSchema>;
+
+export const cancelInspectionRequestSchema = z.object({
+  id: z.string().min(1, "Inspection is required"),
+  reason: z.string().trim().min(1, "A reason is required"),
+});
+export type CancelInspectionRequest = z.infer<typeof cancelInspectionRequestSchema>;
 
 export const markLeaseEndedRequestSchema = leaseSchema.pick({
   id: true,

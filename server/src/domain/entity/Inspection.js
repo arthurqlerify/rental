@@ -6,6 +6,8 @@ class Inspection {
     turnoverId,
     apartmentId,
     scheduledAt,
+    previousScheduledAt,
+    moveCount,
     assignedToEmail,
     inspectorName,
     locationNotes,
@@ -16,7 +18,9 @@ class Inspection {
     photosUrl,
     passedAt,
     certificateUrl,
-    checklist
+    checklist,
+    cancelledAt,
+    cancellationReason
   }) {
     if (!id) {
       throw new Error('Inspection ID is required.');
@@ -26,6 +30,8 @@ class Inspection {
     this.turnoverId = turnoverId;
     this.apartmentId = apartmentId;
     this.scheduledAt = scheduledAt;
+    this.previousScheduledAt = previousScheduledAt;
+    this.moveCount = moveCount;
     this.assignedToEmail = assignedToEmail;
     this.inspectorName = inspectorName;
     this.locationNotes = locationNotes;
@@ -37,6 +43,8 @@ class Inspection {
     this.passedAt = passedAt;
     this.certificateUrl = certificateUrl;
     this.checklist = checklist;
+    this.cancelledAt = cancelledAt;
+    this.cancellationReason = cancellationReason;
   }
 
   toJSON() {
@@ -45,6 +53,8 @@ class Inspection {
       turnoverId: this.turnoverId,
       apartmentId: this.apartmentId,
       scheduledAt: this.scheduledAt,
+      previousScheduledAt: this.previousScheduledAt,
+      moveCount: this.moveCount,
       assignedToEmail: this.assignedToEmail,
       inspectorName: this.inspectorName,
       locationNotes: this.locationNotes,
@@ -55,7 +65,9 @@ class Inspection {
       photosUrl: this.photosUrl,
       passedAt: this.passedAt,
       certificateUrl: this.certificateUrl,
-      checklist: this.checklist
+      checklist: this.checklist,
+      cancelledAt: this.cancelledAt,
+      cancellationReason: this.cancellationReason
     };
   }
 }

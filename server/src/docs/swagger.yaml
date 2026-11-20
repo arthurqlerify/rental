@@ -57,7 +57,7 @@ paths:
   /schedule-inspection:
     post:
       summary: Schedule Inspection
-      description: Executes the "Schedule Inspection" command. Records an inspection appointment for an active turnover. Refused when no turnover exists with the given turnoverId, and when the turnover is already completed (it has a readyToRentDate).
+      description: Executes the "Schedule Inspection" command. Records an inspection appointment for an active turnover. Refused when no turnover exists with the given turnoverId, when the turnover is already completed (it has a readyToRentDate), and when the turnover already has an open inspection (one with neither a completedAt nor a cancelledAt); reschedule or cancel that one instead.
       operationId: scheduleInspection
       tags:
         - RentalManagementService
@@ -76,6 +76,50 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ScheduleInspectionRequest'
+  /reschedule-inspection:
+    post:
+      summary: Reschedule Inspection
+      description: Executes the "Reschedule Inspection" command. Moves an inspection to another time (scheduledAt), gives it to another inspector (assignedToEmail), or both; a field left out keeps its value. When the time changes, the inspection is moved: the time it had until then is kept in previousScheduledAt and moveCount goes up by one. An inspection can be moved at most 3 times; giving it to another inspector, or sending its current time again, is not a move. Refused when no inspection exists with the given id, when neither scheduledAt nor assignedToEmail is given, when the inspection is already completed (it has a completedAt), when it is cancelled (it has a cancelledAt), and when the time changes on an inspection already moved 3 times (moveCount 3).
+      operationId: rescheduleInspection
+      tags:
+        - RentalManagementService
+      responses:
+        '200':
+          description: 'OK: The inspection was rescheduled.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inspection'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RescheduleInspectionRequest'
+  /cancel-inspection:
+    post:
+      summary: Cancel Inspection
+      description: Executes the "Cancel Inspection" command. Records the cancellation with its reason (cancelledAt, cancellationReason). The inspection is kept, so it stays in Get All Inspections marked as cancelled, and the turnover can have another inspection scheduled. Refused when no inspection exists with the given id, without a reason, when the inspection is already completed (it has a completedAt), and when it is already cancelled.
+      operationId: cancelInspection
+      tags:
+        - RentalManagementService
+      responses:
+        '200':
+          description: 'OK: The inspection was cancelled.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inspection'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CancelInspectionRequest'
   /mark-lease-ended:
     post:
       summary: Mark Lease Ended
@@ -910,6 +954,14 @@ components:
           type: string
           description: The scheduledAt of the Inspection.
           example: 2025-09-28T09:00
+        previousScheduledAt:
+          type: string
+          description: The time the Inspection was scheduled for before it was last moved by Reschedule Inspection, shown in the list as "moved from". Not set while the Inspection has never been moved to another time.
+          example: 2025-09-27T09:00
+        moveCount:
+          type: integer
+          description: How many times Reschedule Inspection has moved the Inspection to another time, shown in the list. At most 3. Not set while the Inspection has never been moved to another time.
+          example: 1
         assignedToEmail:
           type: string
           description: The assignedToEmail of the Inspection.
@@ -954,6 +1006,14 @@ components:
           type: string
           description: 'The move-out checklist items ticked when the Inspection was completed, one "Room: item" per line.'
           example: "Entrance: Doorbell and intercom work\nKitchen: Sink and tap free of leaks"
+        cancelledAt:
+          type: string
+          description: When the Inspection was cancelled (an ISO timestamp, the server's time). An Inspection with a cancelledAt is cancelled.
+          example: '2025-09-26T14:05:00.000Z'
+        cancellationReason:
+          type: string
+          description: Why the Inspection was cancelled.
+          example: Tenant asked to move out a week later
       required:
         - id
         - turnoverId
@@ -1327,6 +1387,37 @@ components:
         - turnoverId
         - apartmentId
         - scheduledAt
+    RescheduleInspectionRequest:
+      type: object
+      description: Give scheduledAt, assignedToEmail or both; a field left out keeps its value.
+      properties:
+        id:
+          type: string
+          description: The inspection to reschedule.
+          example: insp-9001
+        scheduledAt:
+          type: string
+          description: The new time of the inspection.
+          example: 2025-09-29T14:00
+        assignedToEmail:
+          type: string
+          description: The inspector the inspection is given to.
+          example: inspector2@rentco.com
+      required:
+        - id
+    CancelInspectionRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The inspection to cancel.
+          example: insp-9001
+        reason:
+          type: string
+          example: Tenant asked to move out a week later
+      required:
+        - id
+        - reason
     MarkLeaseEndedRequest:
       type: object
       properties:

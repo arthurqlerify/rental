@@ -1,21 +1,36 @@
 import React from "react";
-import { Inspection } from "@/lib/validators";
+import { Inspection, MAX_INSPECTION_MOVES } from "@/lib/validators";
 import { DataTable } from "@/components/shared/DataTable";
 import { useGetAllInspections } from "@/api/inspections";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { Pencil, CheckSquare, ListChecks } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Pencil, CheckSquare, ListChecks, CalendarClock, XCircle } from "lucide-react";
 
 interface InspectionListProps {
   onCompleteInspection: (inspection: Inspection) => void;
   onPassFinalInspection: (inspection: Inspection) => void;
   onViewChecklist: (inspection: Inspection) => void;
+  onRescheduleInspection: (inspection: Inspection) => void;
+  onCancelInspection: (inspection: Inspection) => void;
 }
+
+// A completed or cancelled inspection can no longer be moved, cancelled or completed.
+const inspectionStatus = (row: Inspection) =>
+  row.cancelledAt ? "Cancelled" : row.completedAt ? "Completed" : "Scheduled";
+
+const statusVariant = {
+  Scheduled: "secondary",
+  Completed: "outline",
+  Cancelled: "destructive",
+} as const;
 
 const inspectionColumns = (
   onCompleteInspection: (inspection: Inspection) => void,
   onPassFinalInspection: (inspection: Inspection) => void,
-  onViewChecklist: (inspection: Inspection) => void
+  onViewChecklist: (inspection: Inspection) => void,
+  onRescheduleInspection: (inspection: Inspection) => void,
+  onCancelInspection: (inspection: Inspection) => void
 ): any[] => [
   {
     accessorKey: "id",
@@ -33,7 +48,42 @@ const inspectionColumns = (
   {
     accessorKey: "scheduledAt",
     header: "Scheduled At",
-    cell: (row: Inspection) => format(new Date(row.scheduledAt), "PPp"),
+    cell: (row: Inspection) => (
+      <div className="space-y-1">
+        <div>{format(new Date(row.scheduledAt), "PPp")}</div>
+        {row.previousScheduledAt && (
+          <div className="text-xs text-muted-foreground">
+            Moved from {format(new Date(row.previousScheduledAt), "PPp")}
+          </div>
+        )}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "moveCount",
+    header: "Times Moved",
+    cell: (row: Inspection) => (
+      <div className="space-y-1">
+        <div>{row.moveCount ?? 0}</div>
+        {(row.moveCount ?? 0) >= MAX_INSPECTION_MOVES && (
+          <div className="text-xs text-muted-foreground">No moves left</div>
+        )}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "assignedToEmail",
+    header: "Assigned To",
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: (row: Inspection) => (
+      <div className="space-y-1">
+        <Badge variant={statusVariant[inspectionStatus(row)]}>{inspectionStatus(row)}</Badge>
+        {row.cancellationReason && <div className="text-xs text-muted-foreground">{row.cancellationReason}</div>}
+      </div>
+    ),
   },
   {
     accessorKey: "inspectorName",
@@ -62,8 +112,24 @@ const inspectionColumns = (
         <Button
           variant="outline"
           size="sm"
+          onClick={() => onRescheduleInspection(row)}
+          disabled={inspectionStatus(row) !== "Scheduled"}
+        >
+          <CalendarClock className="mr-2 h-4 w-4" /> Reschedule
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onCancelInspection(row)}
+          disabled={inspectionStatus(row) !== "Scheduled"}
+        >
+          <XCircle className="mr-2 h-4 w-4" /> Cancel
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
           onClick={() => onCompleteInspection(row)}
-          disabled={!!row.completedAt}
+          disabled={inspectionStatus(row) !== "Scheduled"}
         >
           <Pencil className="mr-2 h-4 w-4" /> Complete
         </Button>
@@ -71,7 +137,7 @@ const inspectionColumns = (
           variant="outline"
           size="sm"
           onClick={() => onPassFinalInspection(row)}
-          disabled={!row.completedAt || !!row.passedAt}
+          disabled={!row.completedAt || !!row.passedAt || !!row.cancelledAt}
         >
           <CheckSquare className="mr-2 h-4 w-4" /> Pass Final
         </Button>
@@ -88,12 +154,25 @@ const inspectionColumns = (
   },
 ];
 
-export const InspectionList = ({ onCompleteInspection, onPassFinalInspection, onViewChecklist }: InspectionListProps) => {
+export const InspectionList = ({
+  onCompleteInspection,
+  onPassFinalInspection,
+  onViewChecklist,
+  onRescheduleInspection,
+  onCancelInspection,
+}: InspectionListProps) => {
   const { data: inspections, isLoading, isError, error } = useGetAllInspections();
 
   const columns = React.useMemo(
-    () => inspectionColumns(onCompleteInspection, onPassFinalInspection, onViewChecklist),
-    [onCompleteInspection, onPassFinalInspection, onViewChecklist]
+    () =>
+      inspectionColumns(
+        onCompleteInspection,
+        onPassFinalInspection,
+        onViewChecklist,
+        onRescheduleInspection,
+        onCancelInspection
+      ),
+    [onCompleteInspection, onPassFinalInspection, onViewChecklist, onRescheduleInspection, onCancelInspection]
   );
 
   return (
