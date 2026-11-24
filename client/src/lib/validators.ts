@@ -131,6 +131,8 @@ export const apartmentSchema = z.object({
   status: z.string().min(1, "Status is required"),
   emptySince: z.string().nullable().optional(), // When it last became empty; null while it has a tenant
   daysEmpty: z.number().nullable().optional(), // Whole days it has been empty, from the server; null while it has a tenant
+  note: z.string().nullable().optional(), // What the next person should know about it; null once cleared
+  noteUpdatedAt: z.string().nullable().optional(), // When the note was last saved; null once cleared
 });
 export type Apartment = z.infer<typeof apartmentSchema>;
 
@@ -443,6 +445,16 @@ export const createApartmentRequestSchema = apartmentSchema.pick({
   status: true,
 });
 export type CreateApartmentRequest = z.infer<typeof createApartmentRequestSchema>;
+
+// The server refuses a longer note, after trimming spaces from both ends.
+export const MAX_APARTMENT_NOTE_LENGTH = 500;
+
+// One note per apartment, which replaces the earlier one. An empty note clears it.
+export const writeApartmentNoteRequestSchema = z.object({
+  apartmentId: z.string().min(1, "Apartment is required"),
+  note: z.string().trim().max(MAX_APARTMENT_NOTE_LENGTH, `A note can be at most ${MAX_APARTMENT_NOTE_LENGTH} characters.`),
+});
+export type WriteApartmentNoteRequest = z.infer<typeof writeApartmentNoteRequestSchema>;
 
 export const issueMonthlyRentChargesRequestSchema = z.object({
   month: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, "Month must be YYYY-MM"),

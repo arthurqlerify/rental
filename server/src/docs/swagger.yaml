@@ -428,6 +428,28 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateApartmentRequest'
+  /write-apartment-note:
+    post:
+      summary: Write Apartment Note
+      description: Executes the "Write Apartment Note" command. Saves a note on the apartment for the next person, such as a key that sticks or a neighbour to call, and the time it was saved (note, noteUpdatedAt). Each apartment has one note, which a new one replaces. The note is trimmed; an empty note clears it, setting both fields to null. Allowed on an apartment of any status, and the note stays when a lease is created or the apartment is vacated. Refused when no apartment exists with the given apartmentId, without a note field, and when the note is longer than 500 characters.
+      operationId: writeApartmentNote
+      tags:
+        - RentalManagementService
+      responses:
+        '200':
+          description: 'OK: The note was saved.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Apartment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WriteApartmentNoteRequest'
   /create-lease:
     post:
       summary: Create Lease
@@ -1281,6 +1303,17 @@ components:
           readOnly: true
           description: Only in Get All Apartments. The whole days the apartment has been empty, counted from emptySince to the server's date (UTC); null for an apartment with a tenant (Occupied) or when no date is known.
           example: 10
+        note:
+          type: string
+          nullable: true
+          description: What the next person should know about the apartment, at most 500 characters. Saved by Write Apartment Note; null or absent when there is none.
+          example: The front door key sticks; ask the neighbour in 22A for help.
+        noteUpdatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the note was last saved; null or absent when there is no note.
+          example: '2025-09-15T12:00:00.000Z'
       required:
         - id
         - propertyId
@@ -1834,6 +1867,21 @@ components:
         - floorAreaSqm
         - bedrooms
         - status
+    WriteApartmentNoteRequest:
+      type: object
+      properties:
+        apartmentId:
+          type: string
+          description: The apartment to write the note on.
+          example: apt-22B
+        note:
+          type: string
+          maxLength: 500
+          description: The note, which replaces the apartment's earlier one. An empty note clears it.
+          example: The front door key sticks; ask the neighbour in 22A for help.
+      required:
+        - apartmentId
+        - note
     CreateLeaseRequest:
       type: object
       properties:
