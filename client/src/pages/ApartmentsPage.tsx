@@ -5,12 +5,23 @@ import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { CreateApartmentForm } from "@/features/apartment-management/CreateApartmentForm";
+import { WriteApartmentNoteForm } from "@/features/apartment-management/WriteApartmentNoteForm";
+import { Apartment } from "@/lib/validators";
 
 const ApartmentsPage = () => {
   const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
+  const [isWriteNoteFormOpen, setIsWriteNoteFormOpen] = useState(false);
+  const [selectedApartment, setSelectedApartment] = useState<Apartment | undefined>(undefined);
+
+  const handleWriteNote = (apartment: Apartment) => {
+    setSelectedApartment(apartment);
+    setIsWriteNoteFormOpen(true);
+  };
 
   const handleFormSuccess = () => {
     setIsCreateFormOpen(false);
+    setIsWriteNoteFormOpen(false);
+    setSelectedApartment(undefined);
   };
 
   return (
@@ -34,7 +45,19 @@ const ApartmentsPage = () => {
         </Dialog>
       </PageHeader>
 
-      <ApartmentList />
+      <ApartmentList onWriteNote={handleWriteNote} />
+
+      <Dialog open={isWriteNoteFormOpen} onOpenChange={setIsWriteNoteFormOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Apartment Note</DialogTitle>
+            <DialogDescription>
+              Write down what the next person should know about this apartment.
+            </DialogDescription>
+          </DialogHeader>
+          <WriteApartmentNoteForm apartment={selectedApartment} onSuccess={handleFormSuccess} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

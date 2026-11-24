@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-import { Apartment, CreateApartmentRequest } from "@/lib/validators";
+import { Apartment, CreateApartmentRequest, WriteApartmentNoteRequest } from "@/lib/validators";
 import { useToast } from "@/hooks/use-toast";
 
 export const useGetAllApartments = () => {
@@ -27,6 +27,29 @@ export const useCreateApartment = () => {
       toast({
         title: "Error",
         description: error.message || "Failed to create apartment.",
+        variant: "destructive",
+      });
+    },
+  });
+};
+
+export const useWriteApartmentNote = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  return useMutation({
+    mutationFn: (data: WriteApartmentNoteRequest) => api.post("/write-apartment-note", data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["apartments"] });
+      toast({
+        title: "Success!",
+        description: "Note saved.",
+        variant: "default",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to save note.",
         variant: "destructive",
       });
     },
