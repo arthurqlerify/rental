@@ -33,8 +33,8 @@ class RecordApartmentVacatedCommand {
 
     const updatedTurnover = await db.update('Turnover', id, updates);
 
-    // THEN: the apartment's status changes to 'Vacant'
-    const updatedApartment = new Apartment({ ...apartment, status: 'Vacant' });
+    // THEN: the apartment's status changes to 'Vacant', and it has been empty since the tenant left
+    const updatedApartment = new Apartment({ ...apartment, status: 'Vacant', emptySince: vacatedAt });
     await db.update('Apartment', apartmentId, updatedApartment.toJSON());
 
     return updatedTurnover;

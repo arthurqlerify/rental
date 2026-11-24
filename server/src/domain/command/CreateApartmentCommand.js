@@ -44,6 +44,8 @@ class CreateApartmentCommand {
       floorAreaSqm: floorAreaSqm.toString(), // Ensure it's stored as string as per OpenAPI
       bedrooms: bedrooms.toString(),         // Ensure it's stored as string as per OpenAPI
       status,
+      // An apartment created without a tenant has been empty since it was created.
+      emptySince: status === 'Occupied' ? null : new Date().toISOString(),
     });
 
     // THEN: Apartment Created is recorded

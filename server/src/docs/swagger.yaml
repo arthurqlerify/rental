@@ -511,7 +511,7 @@ paths:
   /get-all-apartments:
     get:
       summary: Get All Apartments
-      description: Retrieves data based on the "Get All Apartments" query. This is a synchronous query operation.
+      description: Retrieves data based on the "Get All Apartments" query. This is a synchronous query operation. Each apartment comes with daysEmpty, the whole days an apartment without a tenant (Vacant or Ready) has been empty, counted from emptySince to the server's date (UTC); it is null for an apartment with a tenant (Occupied). An apartment saved before emptySince was kept counts from the latest vacatedAt of its turnovers, and shows null when it has none.
       operationId: getAllApartments
       tags:
         - RentalManagementService
@@ -1270,6 +1270,17 @@ components:
           type: string
           description: The status of the Apartment.
           example: Occupied
+        emptySince:
+          type: string
+          nullable: true
+          description: When the apartment last became empty. Set when it is created without a tenant (Vacant or Ready) and to the turnover's vacatedAt when Record Apartment Vacated is recorded; null once Create Lease gives it a tenant.
+          example: '2025-09-05T10:00'
+        daysEmpty:
+          type: integer
+          nullable: true
+          readOnly: true
+          description: Only in Get All Apartments. The whole days the apartment has been empty, counted from emptySince to the server's date (UTC); null for an apartment with a tenant (Occupied) or when no date is known.
+          example: 10
       required:
         - id
         - propertyId

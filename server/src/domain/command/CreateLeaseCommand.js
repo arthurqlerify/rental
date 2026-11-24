@@ -50,8 +50,8 @@ class CreateLeaseCommand {
     await db.insert('Lease', newLease.toJSON());
 
     // THEN: the apartment's status changes to 'Occupied'.
-    // Create a new Apartment instance with the updated status
-    const updatedApartment = new Apartment({ ...apartment, status: 'Occupied' });
+    // Create a new Apartment instance with the updated status; with a tenant it is no longer empty
+    const updatedApartment = new Apartment({ ...apartment, status: 'Occupied', emptySince: null });
     await db.update('Apartment', apartmentId, updatedApartment.toJSON());
 
     return newLease.toJSON();
