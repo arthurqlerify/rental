@@ -28,6 +28,13 @@ const apartmentColumns: any[] = [
     accessorKey: "status",
     header: "Status",
   },
+  {
+    accessorKey: "daysEmpty",
+    header: "Empty For",
+    // Left blank for an apartment with a tenant, which has no daysEmpty.
+    cell: (row: Apartment) =>
+      row.daysEmpty == null ? null : `${row.daysEmpty} ${row.daysEmpty === 1 ? "day" : "days"}`,
+  },
 ];
 
 export const ApartmentList = () => {

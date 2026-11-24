@@ -129,6 +129,8 @@ export const apartmentSchema = z.object({
   floorAreaSqm: z.string().regex(/^\d+(\.\d{1,2})?$/, "Floor area must be a valid number string"),
   bedrooms: z.string().regex(/^\d+$/, "Bedrooms must be a number string"),
   status: z.string().min(1, "Status is required"),
+  emptySince: z.string().nullable().optional(), // When it last became empty; null while it has a tenant
+  daysEmpty: z.number().nullable().optional(), // Whole days it has been empty, from the server; null while it has a tenant
 });
 export type Apartment = z.infer<typeof apartmentSchema>;
 
