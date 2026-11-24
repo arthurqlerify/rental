@@ -1,0 +1,1 @@
+Banner colour: blue
